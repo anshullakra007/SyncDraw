@@ -4,10 +4,11 @@
 ![Socket.io](https://img.shields.io/badge/Socket.io-Realtime-black)
 ![Node.js](https://img.shields.io/badge/Node.js-Backend-green)
 ![Express](https://img.shields.io/badge/Express-Server-lightgrey)
+![Live](https://img.shields.io/badge/Status-Live_Deployed-success)
 
 **SyncDraw** is a high-performance collaborative whiteboard that enables multiple users to draw, brainstorm, and ideate on a shared infinite canvas in real-time. Built to demonstrate low-latency WebSocket communication, it ensures that every stroke made by one user is instantly broadcast to all other connected clients.
 
-🚀 **Live Demo:** [ADD_YOUR_VERCEL_LINK_HERE]
+🚀 **Live Demo:** [Click Here to Open App](https://sync-draw-eight.vercel.app/)
 
 ---
 
