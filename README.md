@@ -1,26 +1,56 @@
-# 🎨 SyncDraw - Real-Time Collaborative Whiteboard
+# 🎨 SyncDraw - Real-time Collaborative Whiteboard
 
-SyncDraw is a high-performance distributed system that enables multiple users to collaborate on a shared digital canvas in real-time. It leverages **WebSockets** for low-latency bidirectional communication and uses an optimistic concurrency model to handle rapid user inputs.
+![React](https://img.shields.io/badge/React-18-blue)
+![Socket.io](https://img.shields.io/badge/Socket.io-Realtime-black)
+![Node.js](https://img.shields.io/badge/Node.js-Backend-green)
+![Express](https://img.shields.io/badge/Express-Server-lightgrey)
 
-## 🚀 Tech Stack
+**SyncDraw** is a high-performance collaborative whiteboard that enables multiple users to draw, brainstorm, and ideate on a shared infinite canvas in real-time. Built to demonstrate low-latency WebSocket communication, it ensures that every stroke made by one user is instantly broadcast to all other connected clients.
 
-* **Backend:** Java 21, Spring Boot, WebSocket API (STOMP Protocol).
-* **Frontend:** React.js, Vite, HTML5 Canvas API.
-* **Architecture:** Event-Driven Architecture with Pub/Sub messaging.
+🚀 **Live Demo:** [ADD_YOUR_VERCEL_LINK_HERE]
 
-## ⚡ Key Features
+---
 
-* **Real-Time Synchronization:** Sub-millisecond latency for drawing events using persistent WebSocket connections.
-* **Broadcast Architecture:** Scalable backend that routes drawing coordinates (`x`, `y`, `color`) to all subscribed clients instantly.
-* **Optimized Rendering:** Uses HTML5 Canvas with efficient React state management to prevent re-render lags.
+## 🌟 Key Features
 
-## 🛠️ How to Run Locally
+* **⚡ Zero-Latency Collaboration:** Uses **Socket.io** to broadcast drawing events (coordinates, color, stroke width) instantly to all users in the room.
+* **🖌️ Rich Drawing Tools:** Includes a customizable pen tool with adjustable colors and brush sizes, plus an eraser and clear-canvas option.
+* **👥 Multi-User Support:** Handles multiple concurrent connections without lag, managing state on the server side.
+* **📱 Responsive Canvas:** The HTML5 Canvas automatically resizes to fit any screen, from desktops to tablets.
+
+---
+
+## 🏗️ Architecture & Tech Stack
+
+This project uses a **Bi-Directional Communication** architecture:
+
+### **Frontend (Client)**
+* **React.js:** Manages the UI state and tool selection.
+* **HTML5 Canvas API:** Handles the raw pixel rendering for high-performance drawing.
+* **Socket.io Client:** Listens for incoming drawing data and emits local user actions.
+
+### **Backend (Server)**
+* **Node.js & Express:** Serves the application and handles HTTP requests.
+* **Socket.io Server:** Acts as the central hub (Signaling Server) that receives drawing packets and broadcasts them to all other connected clients.
+
+---
+
+## 🛠️ System Design (How it Works)
+
+1.  **Connection:** When a user joins, a WebSocket handshake is established between the Client and Server.
+2.  **Emission:** When User A draws, the client captures the mouse coordinates `(x, y)` and emits a `draw` event to the server.
+3.  **Broadcasting:** The server receives the event and immediately broadcasts it to **User B, User C, etc.** (excluding User A).
+4.  **Rendering:** The receiving clients use the Canvas API to draw a line connecting the new coordinates, creating a seamless stroke.
+
+---
+
+## 🚀 Running Locally
 
 ### Prerequisites
-* Java 21
-* Node.js (v18+)
+* Node.js (v16 or higher)
+* npm (Node Package Manager)
 
-### 1. Start the Backend (Server)
+### 1. Clone the Repository
 ```bash
-cd backend
-./gradlew bootRun
+git clone [https://github.com/anshullakra007/syncdraw.git](https://github.com/anshullakra007/syncdraw.git)
+cd syncdraw
