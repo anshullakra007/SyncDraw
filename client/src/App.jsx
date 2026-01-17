@@ -22,7 +22,7 @@ function App() {
     // 2. Connect to Java Backend
     const client = new Client({
       // We connect to the raw WebSocket endpoint exposed by Spring Boot
-      brokerURL: 'ws://localhost:8080/ws/websocket', 
+      brokerURL: 'wss://syncdraw-backend.onrender.com/ws/websocket', 
       onConnect: () => {
         console.log('✅ Connected to WebSocket');
         
