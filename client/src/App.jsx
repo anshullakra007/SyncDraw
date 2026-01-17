@@ -1,61 +1,58 @@
 import { useEffect, useRef, useState } from 'react';
 import { Client } from '@stomp/stompjs';
 
-// 🎨 Random color for this user
-const USER_COLOR = '#' + Math.floor(Math.random() * 16777215).toString(16);
+// 🛠️ Default Configuration
+const INITIAL_COLOR = '#000000';
+const INITIAL_SIZE = 5;
 
 function App() {
   const canvasRef = useRef(null);
   const stompClientRef = useRef(null);
+
+  // 🎨 State Management
+  const [color, setColor] = useState(INITIAL_COLOR);
+  const [brushSize, setBrushSize] = useState(INITIAL_SIZE);
   const [isDrawing, setIsDrawing] = useState(false);
   const [prevPos, setPrevPos] = useState({ x: 0, y: 0 });
+  
+  // ↩️ Undo/Redo History
+  const [history, setHistory] = useState([]);
+  const [redoStack, setRedoStack] = useState([]);
 
   useEffect(() => {
-    // 1. Initialize Canvas
+    // 1. Setup Canvas
     const canvas = canvasRef.current;
-    // Set canvas size to full screen
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-
+    
     const ctx = canvas.getContext('2d');
     ctx.lineCap = 'round';
-    ctx.lineWidth = 4;
+    ctx.lineJoin = 'round';
+    ctx.fillStyle = '#f0f0f0'; // Background color
+    ctx.fillRect(0, 0, canvas.width, canvas.height); // Fill bg so save works
 
-    // 2. Connect to Java Backend
+    // 2. Connect to WebSocket
     const client = new Client({
       brokerURL: 'wss://syncdraw-backend.onrender.com/ws/websocket',
       onConnect: () => {
         console.log('✅ Connected to WebSocket');
-
-        // Subscribe to incoming drawings from other users
         client.subscribe('/topic/canvas', (message) => {
           const data = JSON.parse(message.body);
-          drawOnCanvas(data.x, data.y, data.prevX, data.prevY, data.color);
+          handleIncomingDraw(data);
         });
-      },
-      onWebSocketError: (error) => {
-        console.error('Error with websocket', error);
-      },
-      onStompError: (frame) => {
-        console.error('Broker reported error: ' + frame.headers['message']);
-        console.error('Additional details: ' + frame.body);
       },
     });
 
     client.activate();
     stompClientRef.current = client;
 
-    // Prevent scrolling on mobile when touching the canvas
+    // 3. Prevent Mobile Scrolling
     const preventScroll = (e) => {
-      if (e.target === canvas) {
-        e.preventDefault();
-      }
+      if (e.target === canvas) e.preventDefault();
     };
-    
     document.body.addEventListener('touchstart', preventScroll, { passive: false });
     document.body.addEventListener('touchmove', preventScroll, { passive: false });
 
-    // Cleanup on close
     return () => {
       client.deactivate();
       document.body.removeEventListener('touchstart', preventScroll);
@@ -63,104 +60,200 @@ function App() {
     };
   }, []);
 
-  // 🖌️ Helper: Draws a line on the canvas
-  const drawOnCanvas = (x, y, prevX, prevY, color) => {
+  // 📩 Handle Messages from Server
+  const handleIncomingDraw = (data) => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
-    ctx.beginPath();
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 4; // Ensure line width is consistent
-    ctx.moveTo(prevX, prevY);
-    ctx.lineTo(x, y);
-    ctx.stroke();
-    ctx.closePath();
-  };
-
-  // 🖱️👆 Universal Helper: Get coordinates for both Mouse and Touch
-  const getCoordinates = (event) => {
-    if (!canvasRef.current) return { x: 0, y: 0 };
-
-    // Check if it is a touch event
-    if (event.touches && event.touches.length > 0) {
-      const rect = canvasRef.current.getBoundingClientRect();
-      return {
-        x: event.touches[0].clientX - rect.left,
-        y: event.touches[0].clientY - rect.top
-      };
+    // 🧹 Handle "Clear Board" Signal
+    if (data.color === 'CLEAR') {
+      ctx.fillStyle = '#f0f0f0';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      return;
     }
 
-    // Otherwise it is a mouse event
-    return {
-      x: event.nativeEvent.offsetX,
-      y: event.nativeEvent.offsetY
-    };
+    // 🖌️ Handle Drawing
+    // Protocol: "HEXCOLOR:SIZE" (e.g., "#FF0000:5")
+    const [remoteColor, remoteSize] = data.color.split(':');
+    
+    ctx.beginPath();
+    ctx.strokeStyle = remoteColor;
+    ctx.lineWidth = parseInt(remoteSize || 5, 10);
+    ctx.moveTo(data.prevX, data.prevY);
+    ctx.lineTo(data.x, data.y);
+    ctx.stroke();
   };
 
+  // 👆 Coordinate Helper (Mouse + Touch)
+  const getCoordinates = (e) => {
+    if (!canvasRef.current) return { x: 0, y: 0 };
+    if (e.touches && e.touches.length > 0) {
+      const rect = canvasRef.current.getBoundingClientRect();
+      return {
+        x: e.touches[0].clientX - rect.left,
+        y: e.touches[0].clientY - rect.top
+      };
+    }
+    return { x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY };
+  };
+
+  // 🖱️ Start Drawing
   const startDrawing = (e) => {
     setIsDrawing(true);
     const { x, y } = getCoordinates(e);
     setPrevPos({ x, y });
+    saveHistory(); // Save state before new stroke
   };
 
+  // 🖱️ Draw Move
   const draw = (e) => {
     if (!isDrawing) return;
-    
-    // Stop scrolling on mobile while drawing
-    // (Note: e.preventDefault might be ignored in React synthetic events, 
-    // so we also added the document listener in useEffect)
-    // e.preventDefault(); 
+    const { x, y } = getCoordinates(e);
 
-    const { x: currentX, y: currentY } = getCoordinates(e);
+    // Draw Locally
+    const ctx = canvasRef.current.getContext('2d');
+    ctx.beginPath();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = brushSize;
+    ctx.moveTo(prevPos.x, prevPos.y);
+    ctx.lineTo(x, y);
+    ctx.stroke();
 
-    // 1. Draw locally (so it feels fast)
-    drawOnCanvas(currentX, currentY, prevPos.x, prevPos.y, USER_COLOR);
-
-    // 2. Send data to Backend
-    if (stompClientRef.current && stompClientRef.current.connected) {
+    // Send to Network
+    if (stompClientRef.current?.connected) {
       stompClientRef.current.publish({
         destination: '/app/draw',
         body: JSON.stringify({
-          x: currentX,
-          y: currentY,
-          prevX: prevPos.x,
-          prevY: prevPos.y,
-          color: USER_COLOR
+          x, y, 
+          prevX: prevPos.x, 
+          prevY: prevPos.y, 
+          // 🧠 Hack: Pack Size into Color string
+          color: `${color}:${brushSize}` 
         })
       });
     }
 
-    setPrevPos({ x: currentX, y: currentY });
+    setPrevPos({ x, y });
   };
 
   const stopDrawing = () => {
     setIsDrawing(false);
   };
 
+  // 💾 Save History for Undo
+  const saveHistory = () => {
+    const canvas = canvasRef.current;
+    // Limit history to 20 steps to save memory
+    if (history.length >= 20) history.shift(); 
+    setHistory([...history, canvas.toDataURL()]);
+    setRedoStack([]); // Clear redo stack on new action
+  };
+
+  // ↩️ Undo Function
+  const handleUndo = () => {
+    if (history.length === 0) return;
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    
+    const previousState = history[history.length - 1];
+    const img = new Image();
+    img.src = previousState;
+    img.onload = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0);
+    };
+
+    setRedoStack([canvas.toDataURL(), ...redoStack]);
+    setHistory(history.slice(0, -1));
+  };
+
+  // 🧹 Clear Board Function
+  const clearBoard = () => {
+    // 1. Clear Locally
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#f0f0f0';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // 2. Broadcast Clear
+    if (stompClientRef.current?.connected) {
+      stompClientRef.current.publish({
+        destination: '/app/draw',
+        body: JSON.stringify({ x:0, y:0, prevX:0, prevY:0, color: 'CLEAR' })
+      });
+    }
+  };
+
+  // 💾 Download Image
+  const downloadBoard = () => {
+    const link = document.createElement('a');
+    link.download = 'syncdraw-masterpiece.png';
+    link.href = canvasRef.current.toDataURL();
+    link.click();
+  };
+
   return (
     <div style={{ overflow: 'hidden', height: '100vh', width: '100vw', background: '#f0f0f0', touchAction: 'none' }}>
-      <h3 style={{ position: 'absolute', top: 10, left: 20, zIndex: 10, pointerEvents: 'none' }}>
-        SyncDraw: <span style={{ color: USER_COLOR }}>You are this color</span>
-      </h3>
+      
+      {/* 🛠️ Floating Toolbar */}
+      <div style={{
+        position: 'absolute', top: 20, left: '50%', transform: 'translateX(-50%)',
+        background: 'white', padding: '10px 20px', borderRadius: '50px',
+        boxShadow: '0 4px 6px rgba(0,0,0,0.1)', display: 'flex', gap: '15px', alignItems: 'center', zIndex: 100
+      }}>
+        
+        {/* Color Picker */}
+        <input 
+          type="color" 
+          value={color} 
+          onChange={(e) => setColor(e.target.value)} 
+          style={{ width: '40px', height: '40px', border: 'none', cursor: 'pointer', background: 'none' }}
+        />
+
+        {/* Brush Size Slider */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+          <span style={{ fontSize: '12px' }}>Size:</span>
+          <input 
+            type="range" min="1" max="20" 
+            value={brushSize} 
+            onChange={(e) => setBrushSize(e.target.value)}
+            style={{ width: '80px' }} 
+          />
+        </div>
+
+        {/* Separator */}
+        <div style={{ width: '1px', height: '30px', background: '#ddd' }}></div>
+
+        {/* Actions */}
+        <button onClick={handleUndo} style={btnStyle} title="Undo">↩️</button>
+        <button onClick={clearBoard} style={btnStyle} title="Clear">🧹</button>
+        <button onClick={downloadBoard} style={btnStyle} title="Save">💾</button>
+      </div>
+
       <canvas
         ref={canvasRef}
-        
-        // Mouse Events
         onMouseDown={startDrawing}
         onMouseMove={draw}
         onMouseUp={stopDrawing}
         onMouseOut={stopDrawing}
-        
-        // Touch Events (For Mobile)
         onTouchStart={startDrawing}
         onTouchMove={draw}
         onTouchEnd={stopDrawing}
-        
-        style={{ cursor: 'crosshair', display: 'block', touchAction: 'none' }}
+        style={{ cursor: 'crosshair', display: 'block' }}
       />
     </div>
   );
 }
+
+// Simple button style
+const btnStyle = {
+  background: 'none',
+  border: 'none',
+  fontSize: '20px',
+  cursor: 'pointer',
+  padding: '5px',
+  borderRadius: '5px',
+  transition: 'background 0.2s',
+};
 
 export default App;
