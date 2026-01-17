@@ -1,0 +1,25 @@
+# Mac System Files
+.DS_Store
+
+# Java / Spring Boot
+target/
+.mvn/
+mvnw
+mvnw.cmd
+.classpath
+.project
+.settings/
+.vscode/
+
+# Gradle
+.gradle/
+build/
+gradle/
+gradlew
+gradlew.bat
+
+# Node / React
+node_modules/
+dist/
+.env
+.env.local
