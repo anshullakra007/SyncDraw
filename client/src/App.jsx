@@ -79,15 +79,15 @@ function App() {
       return;
     }
 
-    // 🖌️ Handle Drawing
+    // 🖌️ Handle Drawing using mapped relative coordinates
     // Protocol: "HEXCOLOR:SIZE" (e.g., "#FF0000:5")
     const [remoteColor, remoteSize] = data.color.split(':');
     
     ctx.beginPath();
     ctx.strokeStyle = remoteColor;
     ctx.lineWidth = parseInt(remoteSize || 5, 10);
-    ctx.moveTo(data.prevX, data.prevY);
-    ctx.lineTo(data.x, data.y);
+    ctx.moveTo(data.prevX * window.innerWidth, data.prevY * window.innerHeight);
+    ctx.lineTo(data.x * window.innerWidth, data.y * window.innerHeight);
     ctx.stroke();
   };
 
@@ -126,14 +126,15 @@ function App() {
     ctx.lineTo(x, y);
     ctx.stroke();
 
-    // Send to Network
+    // Send to Network using Relative Coordinates
     if (stompClientRef.current?.connected) {
       stompClientRef.current.publish({
         destination: '/app/draw',
         body: JSON.stringify({
-          x, y, 
-          prevX: prevPos.x, 
-          prevY: prevPos.y, 
+          x: x / window.innerWidth, 
+          y: y / window.innerHeight, 
+          prevX: prevPos.x / window.innerWidth, 
+          prevY: prevPos.y / window.innerHeight, 
           // 🧠 Hack: Pack Size into Color string
           color: `${color}:${brushSize}` 
         })
