@@ -211,21 +211,34 @@ function App() {
   if (!token) {
     return (
       <div className="login-container">
-        <div className="glass-card">
-          <h1>SyncDraw</h1>
-          <p>Collaborate and create together in real-time.</p>
-          <GoogleLogin
-            onSuccess={(credentialResponse) => {
-              setToken(credentialResponse.credential);
-              localStorage.setItem('syncdraw_token', credentialResponse.credential);
-            }}
-            onError={() => {
-              console.log('Login Failed');
-            }}
-            shape="pill"
-            theme="filled_black"
-            size="large"
-          />
+        <div className="login-left">
+          <div className="login-content">
+            <div className="login-logo">
+              <div className="login-logo-icon"></div>
+              SyncDraw
+            </div>
+            <h1>Log in to your canvas</h1>
+            <p>Join your team's real-time collaborative workspace. Start sketching, mapping, and creating together.</p>
+            
+            <div style={{ marginTop: '0.5rem' }}>
+              <GoogleLogin
+                onSuccess={(credentialResponse) => {
+                  setToken(credentialResponse.credential);
+                  localStorage.setItem('syncdraw_token', credentialResponse.credential);
+                }}
+                onError={() => {
+                  console.log('Login Failed');
+                }}
+                theme="outline"
+                size="large"
+                text="continue_with"
+                width="100%"
+              />
+            </div>
+          </div>
+        </div>
+        <div className="login-right">
+          {/* Subtle pattern background handled by CSS */}
         </div>
       </div>
     );
@@ -234,39 +247,53 @@ function App() {
   return (
     <div className="canvas-container">
       
-      {/* 🛠️ Floating Toolbar */}
+      {/* 🛠️ Professional Toolbar */}
       <div className="toolbar">
         
         {/* Color Picker */}
-        <input 
-          className="color-picker"
-          type="color" 
-          value={color} 
-          onChange={(e) => setColor(e.target.value)} 
-        />
-
-        {/* Brush Size Slider */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ fontSize: '13px', fontWeight: '600', color: '#333' }}>Size:</span>
+        <div className="color-picker-wrapper">
           <input 
-            type="range" min="1" max="20" 
-            value={brushSize} 
-            onChange={(e) => setBrushSize(e.target.value)}
-            style={{ width: '80px', cursor: 'pointer' }} 
+            className="color-picker"
+            type="color" 
+            value={color} 
+            onChange={(e) => setColor(e.target.value)} 
           />
         </div>
 
-        {/* Separator */}
-        <div style={{ width: '1px', height: '30px', background: 'rgba(0,0,0,0.1)' }}></div>
+        <div className="toolbar-divider"></div>
+
+        {/* Brush Size Slider */}
+        <div className="size-slider-wrapper">
+          <span>Size</span>
+          <input 
+            className="size-slider"
+            type="range" min="1" max="20" 
+            value={brushSize} 
+            onChange={(e) => setBrushSize(e.target.value)}
+          />
+        </div>
+
+        <div className="toolbar-divider"></div>
 
         {/* Actions */}
-        <button onClick={handleUndo} className="toolbar-btn" title="Undo">↩️</button>
-        <button onClick={clearBoard} className="toolbar-btn" title="Clear">🧹</button>
-        <button onClick={downloadBoard} className="toolbar-btn" title="Save">💾</button>
+        <button onClick={handleUndo} className="toolbar-btn" title="Undo">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
+          Undo
+        </button>
+        <button onClick={clearBoard} className="toolbar-btn" title="Clear">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+          Clear
+        </button>
+        <button onClick={downloadBoard} className="toolbar-btn" title="Save">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          Save
+        </button>
         
-        {/* Separator */}
-        <div style={{ width: '1px', height: '30px', background: 'rgba(0,0,0,0.1)' }}></div>
-        <button onClick={handleLogout} className="toolbar-btn" title="Logout">🚪</button>
+        <div className="toolbar-divider"></div>
+        
+        <button onClick={handleLogout} className="toolbar-btn" style={{ color: '#ef4444' }} title="Logout">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+        </button>
       </div>
 
       <canvas
