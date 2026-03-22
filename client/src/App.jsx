@@ -210,62 +210,63 @@ function App() {
 
   if (!token) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#f0f0f0' }}>
-        <h1 style={{ marginBottom: '20px', fontFamily: 'sans-serif' }}>Welcome to SyncDraw</h1>
-        <p style={{ marginBottom: '30px', fontFamily: 'sans-serif', color: '#555' }}>Please log in to start drawing with others.</p>
-        <GoogleLogin
-          onSuccess={(credentialResponse) => {
-            setToken(credentialResponse.credential);
-            localStorage.setItem('syncdraw_token', credentialResponse.credential);
-          }}
-          onError={() => {
-            console.log('Login Failed');
-          }}
-        />
+      <div className="login-container">
+        <div className="glass-card">
+          <h1>SyncDraw</h1>
+          <p>Collaborate and create together in real-time.</p>
+          <GoogleLogin
+            onSuccess={(credentialResponse) => {
+              setToken(credentialResponse.credential);
+              localStorage.setItem('syncdraw_token', credentialResponse.credential);
+            }}
+            onError={() => {
+              console.log('Login Failed');
+            }}
+            shape="pill"
+            theme="filled_black"
+            size="large"
+          />
+        </div>
       </div>
     );
   }
 
   return (
-    <div style={{ overflow: 'hidden', height: '100vh', width: '100vw', background: '#f0f0f0', touchAction: 'none' }}>
+    <div className="canvas-container">
       
       {/* 🛠️ Floating Toolbar */}
-      <div style={{
-        position: 'absolute', top: 20, left: '50%', transform: 'translateX(-50%)',
-        background: 'white', padding: '10px 20px', borderRadius: '50px',
-        boxShadow: '0 4px 6px rgba(0,0,0,0.1)', display: 'flex', gap: '15px', alignItems: 'center', zIndex: 100
-      }}>
+      <div className="toolbar">
         
         {/* Color Picker */}
         <input 
+          className="color-picker"
           type="color" 
           value={color} 
           onChange={(e) => setColor(e.target.value)} 
-          style={{ width: '40px', height: '40px', border: 'none', cursor: 'pointer', background: 'none' }}
         />
 
         {/* Brush Size Slider */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-          <span style={{ fontSize: '12px' }}>Size:</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ fontSize: '13px', fontWeight: '600', color: '#333' }}>Size:</span>
           <input 
             type="range" min="1" max="20" 
             value={brushSize} 
             onChange={(e) => setBrushSize(e.target.value)}
-            style={{ width: '80px' }} 
+            style={{ width: '80px', cursor: 'pointer' }} 
           />
         </div>
 
         {/* Separator */}
-        <div style={{ width: '1px', height: '30px', background: '#ddd' }}></div>
+        <div style={{ width: '1px', height: '30px', background: 'rgba(0,0,0,0.1)' }}></div>
 
         {/* Actions */}
-        <button onClick={handleUndo} style={btnStyle} title="Undo">↩️</button>
-        <button onClick={clearBoard} style={btnStyle} title="Clear">🧹</button>
-        <button onClick={downloadBoard} style={btnStyle} title="Save">💾</button>
+        <button onClick={handleUndo} className="toolbar-btn" title="Undo">↩️</button>
+        <button onClick={clearBoard} className="toolbar-btn" title="Clear">🧹</button>
+        <button onClick={downloadBoard} className="toolbar-btn" title="Save">💾</button>
         
         {/* Separator */}
-        <div style={{ width: '1px', height: '30px', background: '#ddd' }}></div>
-        <button onClick={handleLogout} style={btnStyle} title="Logout">🚪</button>
+        <div style={{ width: '1px', height: '30px', background: 'rgba(0,0,0,0.1)' }}></div>
+        <button onClick={handleLogout} className="toolbar-btn" title="Logout">🚪</button>
       </div>
 
       <canvas
@@ -282,16 +283,5 @@ function App() {
     </div>
   );
 }
-
-// Simple button style
-const btnStyle = {
-  background: 'none',
-  border: 'none',
-  fontSize: '20px',
-  cursor: 'pointer',
-  padding: '5px',
-  borderRadius: '5px',
-  transition: 'background 0.2s',
-};
 
 export default App;
