@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: syncdraw-backend
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: PORT
+        value: 8080
