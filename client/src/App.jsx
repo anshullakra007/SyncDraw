@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Client } from '@stomp/stompjs';
+import { GoogleLogin } from '@react-oauth/google';
 
 // 🛠️ Default Configuration
 const INITIAL_COLOR = '#000000';
@@ -10,6 +11,7 @@ function App() {
   const stompClientRef = useRef(null);
 
   // 🎨 State Management
+  const [token, setToken] = useState(localStorage.getItem('syncdraw_token') || null);
   const [color, setColor] = useState(INITIAL_COLOR);
   const [brushSize, setBrushSize] = useState(INITIAL_SIZE);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -20,6 +22,8 @@ function App() {
   const [redoStack, setRedoStack] = useState([]);
 
   useEffect(() => {
+    if (!token) return;
+
     // 1. Setup Canvas
     const canvas = canvasRef.current;
     canvas.width = window.innerWidth;
@@ -33,7 +37,10 @@ function App() {
 
     // 2. Connect to WebSocket
     const client = new Client({
-      brokerURL: 'wss://syncdraw-backend.onrender.com/ws/websocket',
+      brokerURL: import.meta.env.VITE_WS_URL || 'ws://localhost:8080/ws/websocket',
+      connectHeaders: {
+        Authorization: `Bearer ${token}`
+      },
       onConnect: () => {
         console.log('✅ Connected to WebSocket');
         client.subscribe('/topic/canvas', (message) => {
@@ -58,7 +65,7 @@ function App() {
       document.body.removeEventListener('touchstart', preventScroll);
       document.body.removeEventListener('touchmove', preventScroll);
     };
-  }, []);
+  }, [token]);
 
   // 📩 Handle Messages from Server
   const handleIncomingDraw = (data) => {
@@ -192,6 +199,33 @@ function App() {
     link.click();
   };
 
+  // 🚪 Logout
+  const handleLogout = () => {
+    setToken(null);
+    localStorage.removeItem('syncdraw_token');
+    if (stompClientRef.current) {
+      stompClientRef.current.deactivate();
+    }
+  };
+
+  if (!token) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#f0f0f0' }}>
+        <h1 style={{ marginBottom: '20px', fontFamily: 'sans-serif' }}>Welcome to SyncDraw</h1>
+        <p style={{ marginBottom: '30px', fontFamily: 'sans-serif', color: '#555' }}>Please log in to start drawing with others.</p>
+        <GoogleLogin
+          onSuccess={(credentialResponse) => {
+            setToken(credentialResponse.credential);
+            localStorage.setItem('syncdraw_token', credentialResponse.credential);
+          }}
+          onError={() => {
+            console.log('Login Failed');
+          }}
+        />
+      </div>
+    );
+  }
+
   return (
     <div style={{ overflow: 'hidden', height: '100vh', width: '100vw', background: '#f0f0f0', touchAction: 'none' }}>
       
@@ -228,6 +262,10 @@ function App() {
         <button onClick={handleUndo} style={btnStyle} title="Undo">↩️</button>
         <button onClick={clearBoard} style={btnStyle} title="Clear">🧹</button>
         <button onClick={downloadBoard} style={btnStyle} title="Save">💾</button>
+        
+        {/* Separator */}
+        <div style={{ width: '1px', height: '30px', background: '#ddd' }}></div>
+        <button onClick={handleLogout} style={btnStyle} title="Logout">🚪</button>
       </div>
 
       <canvas
