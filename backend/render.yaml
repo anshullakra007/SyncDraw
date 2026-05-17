@@ -1,15 +1,12 @@
 services:
   - type: web
-    name: syncdraw-backend
+    name: syncdraw-backend-baq7
     env: node
-    region: oregon
-    plan: free
+    rootDir: backend
     buildCommand: npm install
-    startCommand: node server.js
+    startCommand: npm start
     envVars:
-      - key: GOOGLE_CLIENT_ID
-        sync: false
-      - key: ALLOWED_ORIGINS
-        value: https://sync-draw-eight.vercel.app,http://localhost:3000,http://localhost:5173
+      - key: ALLOWED_ORIGIN
+        value: https://sync-draw-eight.vercel.app
       - key: PORT
         value: 8080

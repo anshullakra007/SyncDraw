@@ -6,6 +6,7 @@ const { OAuth2Client } = require('google-auth-library');
 const cors = require('cors');
 
 const app = express();
+app.set('trust proxy', 1); // Trust Render's reverse proxy for wss:// support
 app.use(cors());
 
 // Parse allowed origins from environment (comma-separated) or use sensible defaults

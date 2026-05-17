@@ -10,7 +10,7 @@ export function useSocket(token, callbacks) {
     if (!token) return;
 
     // Establish WebSocket connection with robust reconnection logic
-    const socket = io(import.meta.env.VITE_WS_URL || 'http://localhost:8080', {
+    const socket = io(import.meta.env.VITE_BACKEND_URL || 'http://localhost:8080', {
       auth: { token },
       reconnection: true,
       reconnectionAttempts: Infinity,
