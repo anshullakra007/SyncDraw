@@ -16,6 +16,8 @@
 
 * **⚡ Zero-Latency Collaboration:** Uses **Socket.io** to broadcast drawing events (coordinates, color, stroke width) instantly to all users in the room.
 * **🖌️ Rich Drawing Tools:** Includes a customizable pen tool with adjustable colors and brush sizes, plus an eraser and clear-canvas option.
+* **🌍 Infinite Canvas:** Use middle-click or `Alt + Drag` to pan, and scroll to zoom in and out of an endless world coordinate system.
+* **🔒 Google Authentication:** WebSocket connections are securely authenticated at the handshake layer using Google OAuth 2.0 JWT tokens.
 * **👥 Multi-User Support:** Handles multiple concurrent connections without lag, managing state on the server side.
 * **📱 Responsive Canvas:** The HTML5 Canvas automatically resizes to fit any screen, from desktops to tablets.
 
@@ -53,5 +55,32 @@ This project uses a **Bi-Directional Communication** architecture:
 
 ### 1. Clone the Repository
 ```bash
-git clone [https://github.com/anshullakra007/syncdraw.git](https://github.com/anshullakra007/syncdraw.git)
+git clone https://github.com/anshullakra007/syncdraw.git
 cd syncdraw
+```
+
+### 2. Set up the Backend
+The backend requires a Google Client ID to securely authenticate WebSocket connections.
+1. Create a `.env` file in the `backend` directory:
+   ```env
+   GOOGLE_CLIENT_ID=your_google_client_id_here
+   ```
+2. Install dependencies and start the server:
+   ```bash
+   cd backend
+   npm install
+   npm start
+   ```
+
+### 3. Set up the Client
+1. Create a `.env` file in the `client` directory:
+   ```env
+   VITE_WS_URL=http://localhost:8080
+   VITE_GOOGLE_CLIENT_ID=your_google_client_id_here
+   ```
+2. Install dependencies and start the React app:
+   ```bash
+   cd ../client
+   npm install
+   npm run dev
+   ```
