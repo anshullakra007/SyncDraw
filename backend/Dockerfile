@@ -1,6 +1,17 @@
-FROM eclipse-temurin:21-jdk-alpine
+FROM node:20-alpine
+
+# Set working directory
 WORKDIR /app
+
+# Install dependencies first for better caching
+COPY package*.json ./
+RUN npm ci --only=production
+
+# Copy application source code
 COPY . .
-RUN ./gradlew bootJar --no-daemon
-# This command finds the jar file automatically, no matter what it is named
-ENTRYPOINT ["sh", "-c", "java -jar build/libs/*.jar"]
+
+# Expose the server port
+EXPOSE 8080
+
+# Start the application
+CMD ["npm", "start"]

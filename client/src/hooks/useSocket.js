@@ -1,0 +1,61 @@
+import { useEffect, useRef, useState } from 'react';
+import { io } from 'socket.io-client';
+
+export function useSocket(token, callbacks) {
+  const [isConnected, setIsConnected] = useState(false);
+  const [userCount, setUserCount] = useState(1);
+  const socketRef = useRef(null);
+
+  useEffect(() => {
+    if (!token) return;
+
+    // Establish WebSocket connection with robust reconnection logic
+    const socket = io(import.meta.env.VITE_WS_URL || 'http://localhost:8080', {
+      auth: { token },
+      reconnection: true,
+      reconnectionAttempts: Infinity,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      timeout: 20000,
+    });
+    
+    socketRef.current = socket;
+
+    socket.on('connect', () => {
+      console.log('✅ Connected to WebSocket server');
+      setIsConnected(true);
+      // State reconciliation is handled by the server emitting 'init-canvas' upon connect
+    });
+
+    socket.on('disconnect', (reason) => {
+      console.warn(`❌ Disconnected from server. Reason: ${reason}`);
+      setIsConnected(false);
+    });
+
+    socket.on('user-count', (n) => setUserCount(n));
+    
+    // Attach dynamically passed callbacks
+    if (callbacks.onInitCanvas) socket.on('init-canvas', callbacks.onInitCanvas);
+    if (callbacks.onDrawStroke) socket.on('draw-stroke', callbacks.onDrawStroke);
+    if (callbacks.onClearCanvas) socket.on('clear-canvas', callbacks.onClearCanvas);
+    if (callbacks.onError) socket.on('connect_error', callbacks.onError);
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [token, callbacks.onInitCanvas, callbacks.onDrawStroke, callbacks.onClearCanvas, callbacks.onError]);
+
+  const emitStroke = (data) => {
+    if (socketRef.current?.connected) {
+      socketRef.current.emit('draw-stroke', data);
+    }
+  };
+
+  const emitClear = () => {
+    if (socketRef.current?.connected) {
+      socketRef.current.emit('clear-canvas');
+    }
+  };
+
+  return { isConnected, userCount, emitStroke, emitClear };
+}
