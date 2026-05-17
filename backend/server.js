@@ -8,10 +8,21 @@ const cors = require('cors');
 const app = express();
 app.use(cors());
 
+// Parse allowed origins from environment (comma-separated) or use sensible defaults
+const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || 'https://sync-draw-eight.vercel.app,http://localhost:3000,http://localhost:5173').split(',').map(s => s.trim());
+
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: process.env.ALLOWED_ORIGIN || 'http://localhost:3000',
+    origin: function (origin, callback) {
+      // Allow requests with no origin (mobile apps, curl, server-to-server)
+      if (!origin || ALLOWED_ORIGINS.includes(origin)) {
+        callback(null, true);
+      } else {
+        console.warn(`[CORS] Blocked origin: ${origin}`);
+        callback(new Error('CORS: origin not allowed'));
+      }
+    },
     methods: ['GET', 'POST']
   }
 });
