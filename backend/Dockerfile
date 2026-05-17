@@ -10,6 +10,9 @@ RUN npm ci --only=production
 # Copy application source code
 COPY . .
 
+# Drop root privileges for security
+USER node
+
 # Expose the server port
 EXPOSE 8080
 

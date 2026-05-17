@@ -48,24 +48,30 @@ function App() {
   const [token, setToken] = useState(localStorage.getItem('syncdraw_token') || null);
   const [color, setColor] = useState(INITIAL_COLOR);
   const [brushSize, setBrushSize] = useState(INITIAL_SIZE);
-  const [activeTool, setActiveTool] = useState('pen'); // 'pen', 'eraser', 'pan'
+  const [activeTool, setActiveTool] = useState('pen');
 
   // Canvas Hook handles all rendering and camera logic
   const { canvasRef, camera, localStrokes, redraw, toWorld } = useCanvas();
+  const lastSyncIndex = useRef(0);
 
   // Socket Hooks handle networking and callbacks
   const { isConnected, userCount, emitStroke, emitClear } = useSocket(token, {
-    onInitCanvas: (h) => {
-      localStrokes.current = h;
-      requestAnimationFrame(redraw);
+    onInitCanvas: (serverStrokes) => {
+      // Retain offline strokes that haven't been broadcasted yet
+      const offlineStrokes = localStrokes.current.slice(lastSyncIndex.current);
+      localStrokes.current = [...serverStrokes, ...offlineStrokes];
+      lastSyncIndex.current = serverStrokes.length;
+      redraw();
     },
     onDrawStroke: (d) => {
       localStrokes.current.push(d);
-      requestAnimationFrame(redraw);
+      lastSyncIndex.current = localStrokes.current.length;
+      redraw();
     },
     onClearCanvas: () => {
       localStrokes.current = [];
-      requestAnimationFrame(redraw);
+      lastSyncIndex.current = 0;
+      redraw();
     },
     onError: (e) => {
       if (e.message.includes('Authentication')) {
@@ -107,7 +113,7 @@ function App() {
       camera.current.x += cx - lastPan.current.x;
       camera.current.y += cy - lastPan.current.y;
       lastPan.current = { x: cx, y: cy };
-      requestAnimationFrame(redraw);
+      redraw();
       return;
     }
     if (!isDrawing.current) return;
@@ -123,7 +129,7 @@ function App() {
     };
 
     localStrokes.current.push(stroke);
-    requestAnimationFrame(redraw);
+    redraw();
     throttledEmit(stroke);
     prevPos.current = w;
   };
@@ -136,13 +142,13 @@ function App() {
   // ── Actions ───────────────────────────────────────────────────────────────
   const clearBoard = () => {
     localStrokes.current = [];
-    requestAnimationFrame(redraw);
+    redraw();
     emitClear();
   };
 
   const recenter = () => {
     camera.current = { x: 0, y: 0, z: 1 };
-    requestAnimationFrame(redraw);
+    redraw();
   };
 
   const download = () => {

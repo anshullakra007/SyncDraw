@@ -11,7 +11,7 @@ app.use(cors());
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: '*', // Allow all origins for the React app
+    origin: process.env.ALLOWED_ORIGIN || 'http://localhost:3000',
     methods: ['GET', 'POST']
   }
 });

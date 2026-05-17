@@ -4,6 +4,7 @@ export function useCanvas() {
   const canvasRef = useRef(null);
   const camera = useRef({ x: 0, y: 0, z: 1 });
   const localStrokes = useRef([]);
+  const frameId = useRef(null);
 
   const redraw = useCallback(() => {
     const canvas = canvasRef.current;
@@ -71,12 +72,21 @@ export function useCanvas() {
     ctx.globalCompositeOperation = 'source-over';
   }, []);
 
+  const safeRedraw = useCallback(() => {
+    if (!frameId.current) {
+      frameId.current = requestAnimationFrame(() => {
+        redraw();
+        frameId.current = null;
+      });
+    }
+  }, [redraw]);
+
   // Handle Resize
   useEffect(() => {
-    const onResize = () => requestAnimationFrame(redraw);
+    const onResize = () => safeRedraw();
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
-  }, [redraw]);
+  }, [safeRedraw]);
 
   // Handle Wheel Events (Zooming & Panning via trackpad)
   useEffect(() => {
@@ -96,12 +106,12 @@ export function useCanvas() {
         camera.current.x -= e.deltaX;
         camera.current.y -= e.deltaY;
       }
-      requestAnimationFrame(redraw);
+      safeRedraw();
     };
 
     canvas.addEventListener('wheel', onWheel, { passive: false });
     return () => canvas.removeEventListener('wheel', onWheel);
-  }, [redraw]);
+  }, [safeRedraw]);
 
   // Helper for converting screen coordinates to world coordinates
   const toWorld = useCallback((sx, sy) => ({
@@ -109,5 +119,5 @@ export function useCanvas() {
     y: (sy - camera.current.y) / camera.current.z,
   }), []);
 
-  return { canvasRef, camera, localStrokes, redraw, toWorld };
+  return { canvasRef, camera, localStrokes, redraw: safeRedraw, toWorld };
 }
