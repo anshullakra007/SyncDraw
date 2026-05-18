@@ -46,9 +46,24 @@ export function useCanvas() {
     }
     ctx.restore();
 
-    // 3. Paint opaque white background beneath all strokes.
-    // This is required for: (a) eraser to work (destination-out needs opaque pixels),
-    // (b) export to produce a white PNG instead of transparent.
+    // 3. Draw dot grid beneath strokes but above white background
+    ctx.globalCompositeOperation = 'destination-over';
+    ctx.save();
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const gs = 20 * camera.current.z;
+    const ox = ((camera.current.x % gs) + gs) % gs;
+    const oy = ((camera.current.y % gs) + gs) % gs;
+    ctx.fillStyle = 'rgba(0,0,0,0.07)';
+    for (let x = ox - gs; x < W + gs; x += gs) {
+      for (let y = oy - gs; y < H + gs; y += gs) {
+        ctx.beginPath();
+        ctx.arc(x, y, 1, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    ctx.restore();
+
+    // 4. Paint opaque white background beneath everything
     ctx.globalCompositeOperation = 'destination-over';
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);

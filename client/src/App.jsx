@@ -109,6 +109,13 @@ function App() {
   };
 
   // ── Actions
+  const undoStroke = () => {
+    if (localStrokes.current.length > 0) {
+      localStrokes.current.pop();
+      redraw();
+    }
+  };
+
   const clearBoard = () => {
     localStrokes.current = [];
     redraw();
@@ -165,7 +172,7 @@ function App() {
 
   // ── Main App
   return (
-    <div className={`app ${cursorClass} ${isPanning.current ? 'is-panning' : ''} relative w-screen h-screen overflow-hidden bg-white bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px]`}>
+    <div className={`app ${cursorClass} ${isPanning.current ? 'is-panning' : ''} relative w-screen h-screen overflow-hidden bg-white`}>
       
       {/* Offline Alert */}
       {!isConnected && (
@@ -186,6 +193,8 @@ function App() {
       <LeftToolbar 
         activeTool={activeTool} 
         setActiveTool={setActiveTool} 
+        onUndo={undoStroke}
+        onClear={clearBoard}
       />
 
       <BottomPanel 
