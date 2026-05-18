@@ -9,18 +9,18 @@
 
 :root {
   --font: 'Outfit', system-ui, sans-serif;
-  --ink:      #f8fafc;
-  --ink-2:    #cbd5e1;
-  --ink-3:    #94a3b8;
-  --border:   rgba(255, 255, 255, 0.15);
-  --bg:       #0f172a;
-  --canvas-bg:#020617;
-  --hover:    rgba(255, 255, 255, 0.1);
+  --ink:      #09090b;
+  --ink-2:    #3f3f46;
+  --ink-3:    #71717a;
+  --border:   rgba(0, 0, 0, 0.08);
+  --bg:       #f4f4f5;
+  --canvas-bg:#ffffff;
+  --hover:    rgba(0, 0, 0, 0.04);
   --danger:   #ef4444;
-  --green:    #22c55e;
+  --green:    #10b981;
   --radius:   12px;
-  --shadow:   0 8px 32px rgba(0,0,0,0.4);
-  --glass-bg: rgba(15, 23, 42, 0.65);
+  --shadow:   0 8px 32px rgba(0,0,0,0.06);
+  --glass-bg: rgba(255, 255, 255, 0.85);
 }
 
 body {
@@ -40,7 +40,7 @@ body {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: radial-gradient(circle at top right, #1e293b, var(--bg));
+  background: radial-gradient(circle at top right, #e4e4e7, var(--bg));
 }
 
 .login-card {
@@ -50,11 +50,10 @@ body {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  background: rgba(255, 255, 255, 0.03);
+  background: #ffffff;
   border: 1px solid var(--border);
   border-radius: 24px;
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(20px);
+  box-shadow: 0 16px 64px rgba(0,0,0,0.06);
 }
 
 .login-logo {
@@ -73,8 +72,8 @@ body {
   width: 24px;
   height: 24px;
   border-radius: 8px;
-  background: linear-gradient(135deg, #38bdf8, #818cf8);
-  box-shadow: 0 0 16px rgba(56, 189, 248, 0.4);
+  background: #000000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .login-card h1 {
@@ -82,7 +81,7 @@ body {
   font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.1;
-  color: #fff;
+  color: var(--ink);
   margin-bottom: 12px;
 }
 
@@ -120,7 +119,7 @@ body {
 
 .app.mode-pen { cursor: crosshair; }
 .app.mode-pan { cursor: grab; }
-.app.mode-eraser { cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20H7L3 16C2.5 15.5 2.5 14.5 3 14L13 4C13.5 3.5 14.5 3.5 15 4L20 9C20.5 9.5 20.5 10.5 20 11L11 20H20V20Z"/></svg>') 0 24, auto; }
+.app.mode-eraser { cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20H7L3 16C2.5 15.5 2.5 14.5 3 14L13 4C13.5 3.5 14.5 3.5 15 4L20 9C20.5 9.5 20.5 10.5 20 11L11 20H20V20Z"/></svg>') 0 24, auto; }
 .app.is-panning { cursor: grabbing !important; }
 
 .drawing-canvas {
@@ -159,7 +158,7 @@ body {
 .sep {
   width: 1px;
   height: 20px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--border);
   margin: 0 8px;
   flex-shrink: 0;
 }
@@ -183,14 +182,14 @@ body {
 
 .icon-btn:hover {
   background: var(--hover);
-  color: #fff;
+  color: var(--ink);
   transform: scale(1.05);
 }
 
 .icon-btn.active {
-  background: rgba(56, 189, 248, 0.15);
-  color: #38bdf8;
-  box-shadow: inset 0 0 0 1px rgba(56, 189, 248, 0.3);
+  background: rgba(0, 0, 0, 0.08);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15);
 }
 
 .icon-btn:active { transform: scale(0.95); }
@@ -231,13 +230,13 @@ body {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.8);
+  border: 1px solid var(--border);
   overflow: hidden;
   cursor: pointer;
   flex-shrink: 0;
   margin: 0 4px;
   transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .color-swatch:hover { transform: scale(1.15); }
@@ -265,7 +264,6 @@ body {
   background: var(--ink);
   flex-shrink: 0;
   transition: width 0.1s, height 0.1s, background 0.2s;
-  box-shadow: 0 0 8px rgba(255,255,255,0.2);
 }
 
 .brush-slider {
@@ -273,7 +271,7 @@ body {
   appearance: none;
   width: 80px;
   height: 4px;
-  background: rgba(255,255,255,0.1);
+  background: rgba(0,0,0,0.1);
   border-radius: 2px;
   outline: none;
   cursor: pointer;
@@ -284,9 +282,9 @@ body {
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: #fff;
+  background: var(--ink);
   cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
   transition: transform 0.1s;
 }
 

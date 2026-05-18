@@ -5,7 +5,7 @@ import throttle from 'lodash.throttle';
 import { useSocket } from './hooks/useSocket';
 import { useCanvas } from './hooks/useCanvas';
 
-const INITIAL_COLOR = '#38bdf8';
+const INITIAL_COLOR = '#000000';
 const INITIAL_SIZE = 4;
 
 const IconPen = () => (
@@ -226,7 +226,7 @@ function App() {
 
         {/* Brush Slider */}
         <div className="brush-row">
-          <div className="brush-dot" style={{ width: dotSize, height: dotSize, background: activeTool === 'eraser' ? '#fff' : color }} />
+          <div className="brush-dot" style={{ width: dotSize, height: dotSize, background: activeTool === 'eraser' ? '#ffffff' : color, border: activeTool === 'eraser' ? '2px solid #d4d4d8' : 'none' }} />
           <input
             type="range" min="2" max="50" value={brushSize}
             onChange={(e) => setBrushSize(+e.target.value)}
