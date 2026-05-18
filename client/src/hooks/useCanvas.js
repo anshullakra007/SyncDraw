@@ -46,6 +46,13 @@ export function useCanvas() {
     }
     ctx.restore();
 
+    // 3. Paint opaque white background beneath all strokes.
+    // This is required for: (a) eraser to work (destination-out needs opaque pixels),
+    // (b) export to produce a white PNG instead of transparent.
+    ctx.globalCompositeOperation = 'destination-over';
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
     // Reset composite mode
     ctx.globalCompositeOperation = 'source-over';
   }, []);

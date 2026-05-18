@@ -1,7 +1,27 @@
-import React from 'react';
-import { Share, Download } from 'lucide-react';
+import React, { useState } from 'react';
+import { Share, Download, Check } from 'lucide-react';
 
 export function TopMenu({ userCount, onExport }) {
+  const [showCopied, setShowCopied] = useState(false);
+
+  const handleShare = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setShowCopied(true);
+      setTimeout(() => setShowCopied(false), 2000);
+    } catch {
+      // Fallback for older browsers
+      const input = document.createElement('input');
+      input.value = window.location.href;
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand('copy');
+      document.body.removeChild(input);
+      setShowCopied(true);
+      setTimeout(() => setShowCopied(false), 2000);
+    }
+  };
+
   return (
     <div className="absolute top-4 left-4 right-4 z-50 flex justify-between items-start pointer-events-none">
       
@@ -21,7 +41,6 @@ export function TopMenu({ userCount, onExport }) {
         {/* Live Users */}
         <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm px-3 py-2 rounded-xl shadow-lg border border-slate-200">
           <div className="flex -space-x-2 mr-1">
-            {/* Mock Avatars based on user count */}
             {Array.from({ length: Math.min(userCount, 3) }).map((_, i) => (
               <div key={i} className="w-6 h-6 rounded-full bg-indigo-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-indigo-700">
                 U{i+1}
@@ -40,9 +59,16 @@ export function TopMenu({ userCount, onExport }) {
         </div>
 
         {/* Share Button */}
-        <button className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl shadow-lg shadow-indigo-600/20 transition-colors text-sm font-medium">
-          <Share size={16} />
-          Share
+        <button 
+          onClick={handleShare}
+          className={`flex items-center gap-1.5 px-4 py-2 rounded-xl shadow-lg transition-all text-sm font-medium ${
+            showCopied 
+              ? 'bg-emerald-500 text-white shadow-emerald-500/20' 
+              : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-600/20'
+          }`}
+        >
+          {showCopied ? <Check size={16} /> : <Share size={16} />}
+          {showCopied ? 'Copied!' : 'Share'}
         </button>
 
         {/* Export Button */}
