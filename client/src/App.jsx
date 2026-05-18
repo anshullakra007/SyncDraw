@@ -224,16 +224,6 @@ function App() {
           <input type="color" value={color} onChange={(e) => { setColor(e.target.value); setActiveTool('pen'); }} />
         </div>
 
-        {/* Brush Slider */}
-        <div className="brush-row">
-          <div className="brush-dot" style={{ width: dotSize, height: dotSize, background: activeTool === 'eraser' ? '#ffffff' : color, border: activeTool === 'eraser' ? '2px solid #d4d4d8' : 'none' }} />
-          <input
-            type="range" min="2" max="50" value={brushSize}
-            onChange={(e) => setBrushSize(+e.target.value)}
-            className="brush-slider"
-          />
-        </div>
-
         <div className="sep" />
 
         {/* Actions */}
@@ -245,21 +235,6 @@ function App() {
         </button>
         <button className="icon-btn" onClick={download} title="Export Image">
           <IconDownload />
-        </button>
-
-        <div className="sep" />
-
-        {/* Live Status */}
-        <div className="live" title="Connected Users">
-          <span className="live-dot" />
-          {userCount}
-        </div>
-
-        <div className="sep" />
-
-        {/* Logout */}
-        <button className="text-btn" onClick={handleLogout}>
-          <IconLogout /> Logout
         </button>
       </div>
 

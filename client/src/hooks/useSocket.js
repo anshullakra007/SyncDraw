@@ -10,7 +10,7 @@ export function useSocket(token, callbacks) {
     if (!token) return;
 
     // Establish WebSocket connection with robust reconnection logic
-    const socket = io(import.meta.env.VITE_BACKEND_URL || 'http://localhost:8080', {
+    const socket = io(import.meta.env.VITE_BACKEND_URL || (window.location.hostname === 'localhost' ? 'http://localhost:8080' : 'https://syncdraw-backend-baq7.onrender.com'), {
       auth: { token },
       reconnection: true,
       reconnectionAttempts: Infinity,
