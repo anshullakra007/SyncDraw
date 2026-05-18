@@ -1,7 +1,7 @@
 services:
   - type: web
     name: syncdraw-backend-baq7
-    runtime: node
+    env: node
     buildCommand: cd backend && npm install
     startCommand: node backend/server.js
     envVars:
