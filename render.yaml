@@ -5,7 +5,9 @@ services:
     buildCommand: cd backend && npm install
     startCommand: node backend/server.js
     envVars:
-      - key: ALLOWED_ORIGIN
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: ALLOWED_ORIGINS
         value: https://sync-draw-eight.vercel.app
       - key: PORT
         value: 8080
