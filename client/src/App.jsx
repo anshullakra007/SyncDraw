@@ -4,8 +4,10 @@ import throttle from 'lodash.throttle';
 
 import { useSocket } from './hooks/useSocket';
 import { useCanvas } from './hooks/useCanvas';
-import { TopBar } from './components/TopBar';
-import { Toolbar } from './components/Toolbar';
+import { TopMenu } from './components/TopMenu';
+import { LeftToolbar } from './components/LeftToolbar';
+import { BottomPanel } from './components/BottomPanel';
+import { ZoomControls } from './components/ZoomControls';
 
 const INITIAL_COLOR = '#0f172a';
 const INITIAL_SIZE = 4;
@@ -66,6 +68,8 @@ function App() {
       lastPan.current = { x: e.clientX || (e.touches && e.touches[0].clientX), y: e.clientY || (e.touches && e.touches[0].clientY) };
       return;
     }
+    // Only draw with pen or eraser tools
+    if (activeTool !== 'pen' && activeTool !== 'eraser') return;
     isDrawing.current = true;
     const s = screenOf(e);
     prevPos.current = toWorld(s.x, s.y);
@@ -124,20 +128,22 @@ function App() {
     localStrokes.current = [];
   };
 
-  // ── Login Page (Tailwind refactor)
+  // ── Cursor class for active tool
+  const cursorClass = activeTool === 'pen' ? 'mode-pen' : activeTool === 'eraser' ? 'mode-eraser' : 'mode-pan';
+
+  // ── Login Page
   if (!token) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-slate-50 relative overflow-hidden">
-        {/* Subtle background decoration */}
-        <div className="absolute top-0 right-0 -mr-32 -mt-32 w-96 h-96 rounded-full bg-blue-100 opacity-50 blur-3xl" />
-        <div className="absolute bottom-0 left-0 -ml-32 -mb-32 w-96 h-96 rounded-full bg-emerald-100 opacity-50 blur-3xl" />
+        <div className="absolute top-0 right-0 -mr-40 -mt-40 w-[500px] h-[500px] rounded-full bg-indigo-100 opacity-40 blur-3xl" />
+        <div className="absolute bottom-0 left-0 -ml-40 -mb-40 w-[500px] h-[500px] rounded-full bg-emerald-100 opacity-40 blur-3xl" />
 
         <div className="relative w-full max-w-md p-10 bg-white border border-slate-200 rounded-3xl shadow-xl z-10 flex flex-col items-center text-center">
-          <div className="w-12 h-12 bg-slate-900 rounded-xl mb-6 shadow-md flex items-center justify-center">
-            <div className="w-4 h-4 bg-white rounded-sm" />
+          <div className="w-14 h-14 bg-slate-900 rounded-2xl mb-6 shadow-lg flex items-center justify-center">
+            <div className="w-5 h-5 bg-white rounded-md" />
           </div>
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">SyncDraw</h1>
-          <p className="text-slate-500 mb-8 px-4">Collaborative workspace for your team. Real-time drawing, infinite canvas.</p>
+          <h1 className="text-3xl font-bold text-slate-900 mb-2 tracking-tight">SyncDraw</h1>
+          <p className="text-slate-500 mb-8 leading-relaxed">Collaborative workspace for your team.<br />Real-time drawing on an infinite canvas.</p>
           
           <div className="w-full flex justify-center">
             <GoogleLogin
@@ -150,36 +156,50 @@ function App() {
               width="320"
             />
           </div>
+
+          <p className="text-xs text-slate-400 mt-6">Secured with Google OAuth 2.0</p>
         </div>
       </div>
     );
   }
 
-  // ── App
+  // ── Main App
   return (
-    <div className={`app mode-${activeTool} ${isPanning.current ? 'is-panning' : ''} relative w-screen h-screen overflow-hidden bg-white`}>
+    <div className={`app ${cursorClass} ${isPanning.current ? 'is-panning' : ''} relative w-screen h-screen overflow-hidden bg-white bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px]`}>
       
       {/* Offline Alert */}
       {!isConnected && (
-        <div className="absolute top-20 left-1/2 -translate-x-1/2 bg-red-500 text-white px-4 py-1.5 rounded-full z-[100] text-sm font-medium shadow-md shadow-red-500/20">
-          Reconnecting to server...
+        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-[200] animate-pulse">
+          <div className="bg-red-500 text-white px-4 py-2 rounded-xl text-sm font-medium shadow-lg shadow-red-500/25 flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-white animate-ping" />
+            Reconnecting to server...
+          </div>
         </div>
       )}
 
-      {/* Floating UI Elements */}
-      <TopBar 
+      {/* Floating UI Panels */}
+      <TopMenu 
         userCount={userCount} 
-        onClear={clearBoard} 
         onExport={download} 
       />
 
-      <Toolbar 
+      <LeftToolbar 
         activeTool={activeTool} 
         setActiveTool={setActiveTool} 
+      />
+
+      <BottomPanel 
+        activeTool={activeTool}
         color={color} 
         setColor={setColor} 
         brushSize={brushSize} 
         setBrushSize={setBrushSize} 
+        onClear={clearBoard}
+      />
+
+      <ZoomControls 
+        camera={camera} 
+        redraw={redraw} 
       />
 
       {/* Canvas */}

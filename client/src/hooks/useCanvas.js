@@ -46,28 +46,6 @@ export function useCanvas() {
     }
     ctx.restore();
 
-    // 3. Draw grid underneath
-    ctx.globalCompositeOperation = 'destination-over';
-    ctx.save();
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const gs = 24 * camera.current.z;
-    const ox = ((camera.current.x % gs) + gs) % gs;
-    const oy = ((camera.current.y % gs) + gs) % gs;
-    ctx.fillStyle = 'rgba(0,0,0,0.08)'; // Light gray dots
-    for (let x = ox - gs; x < W + gs; x += gs) {
-      for (let y = oy - gs; y < H + gs; y += gs) {
-        ctx.beginPath();
-        ctx.arc(x, y, 1.5, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
-    ctx.restore();
-
-    // 4. Draw light background beneath everything
-    ctx.globalCompositeOperation = 'destination-over';
-    ctx.fillStyle = '#ffffff'; // Pure white canvas
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
     // Reset composite mode
     ctx.globalCompositeOperation = 'source-over';
   }, []);
