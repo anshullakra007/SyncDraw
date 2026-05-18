@@ -4,45 +4,11 @@ import throttle from 'lodash.throttle';
 
 import { useSocket } from './hooks/useSocket';
 import { useCanvas } from './hooks/useCanvas';
+import { TopBar } from './components/TopBar';
+import { Toolbar } from './components/Toolbar';
 
-const INITIAL_COLOR = '#000000';
+const INITIAL_COLOR = '#0f172a';
 const INITIAL_SIZE = 4;
-
-const IconPen = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>
-  </svg>
-);
-const IconEraser = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M20 20H7L3 16C2.5 15.5 2.5 14.5 3 14L13 4C13.5 3.5 14.5 3.5 15 4L20 9C20.5 9.5 20.5 10.5 20 11L11 20H20V20Z"/>
-  </svg>
-);
-const IconHand = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M18 11V6a2 2 0 0 0-4 0v5"/><path d="M14 10V4a2 2 0 0 0-4 0v6"/><path d="M10 10.5V3a2 2 0 0 0-4 0v9"/><path d="M6 14v-2a2 2 0 0 0-4 0v6c0 4.4 3.6 8 8 8h2c4.4 0 8-3.6 8-8v-7a2 2 0 0 0-4 0v2"/>
-  </svg>
-);
-const IconRecenter = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/>
-  </svg>
-);
-const IconTrash = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>
-  </svg>
-);
-const IconDownload = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
-  </svg>
-);
-const IconLogout = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
-  </svg>
-);
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem('syncdraw_token') || null);
@@ -57,7 +23,6 @@ function App() {
   // Socket Hooks handle networking and callbacks
   const { isConnected, userCount, emitStroke, emitClear } = useSocket(token, {
     onInitCanvas: (serverStrokes) => {
-      // Retain offline strokes that haven't been broadcasted yet
       const offlineStrokes = localStrokes.current.slice(lastSyncIndex.current);
       localStrokes.current = [...serverStrokes, ...offlineStrokes];
       lastSyncIndex.current = serverStrokes.length;
@@ -94,7 +59,7 @@ function App() {
 
   const throttledEmit = useMemo(() => throttle((data) => emitStroke(data), 15), [emitStroke]);
 
-  // ── Pointer handlers ──────────────────────────────────────────────────────
+  // ── Pointer handlers
   const onDown = (e) => {
     if (e.button === 1 || e.altKey || activeTool === 'pan') {
       isPanning.current = true;
@@ -139,16 +104,11 @@ function App() {
     isPanning.current = false;
   };
 
-  // ── Actions ───────────────────────────────────────────────────────────────
+  // ── Actions
   const clearBoard = () => {
     localStrokes.current = [];
     redraw();
     emitClear();
-  };
-
-  const recenter = () => {
-    camera.current = { x: 0, y: 0, z: 1 };
-    redraw();
   };
 
   const download = () => {
@@ -164,90 +124,73 @@ function App() {
     localStrokes.current = [];
   };
 
-  // ── Login ─────────────────────────────────────────────────────────────────
+  // ── Login Page (Tailwind refactor)
   if (!token) {
     return (
-      <div className="login-page">
-        <div className="login-card">
-          <div className="login-logo">
-            <div className="login-logo-dot" />
-            SyncDraw
+      <div className="flex items-center justify-center min-h-screen bg-slate-50 relative overflow-hidden">
+        {/* Subtle background decoration */}
+        <div className="absolute top-0 right-0 -mr-32 -mt-32 w-96 h-96 rounded-full bg-blue-100 opacity-50 blur-3xl" />
+        <div className="absolute bottom-0 left-0 -ml-32 -mb-32 w-96 h-96 rounded-full bg-emerald-100 opacity-50 blur-3xl" />
+
+        <div className="relative w-full max-w-md p-10 bg-white border border-slate-200 rounded-3xl shadow-xl z-10 flex flex-col items-center text-center">
+          <div className="w-12 h-12 bg-slate-900 rounded-xl mb-6 shadow-md flex items-center justify-center">
+            <div className="w-4 h-4 bg-white rounded-sm" />
           </div>
-          <h1>Canvas for<br />Creative Minds.</h1>
-          <p>Real-time drawing. Zero latency. Infinite space.</p>
-          <div className="login-google-wrap">
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">SyncDraw</h1>
+          <p className="text-slate-500 mb-8 px-4">Collaborative workspace for your team. Real-time drawing, infinite canvas.</p>
+          
+          <div className="w-full flex justify-center">
             <GoogleLogin
               onSuccess={(r) => { setToken(r.credential); localStorage.setItem('syncdraw_token', r.credential); }}
               onError={() => console.log('Login failed')}
-              theme="filled_black"
+              theme="outline"
               size="large"
               text="continue_with"
               shape="pill"
               width="320"
             />
           </div>
-          <p className="login-footer">Sign in securely with Google.</p>
         </div>
       </div>
     );
   }
 
-  // ── App ───────────────────────────────────────────────────────────────────
-  const dotSize = Math.min(Math.max(brushSize, 4), 20);
-
+  // ── App
   return (
-    <div className={`app mode-${activeTool} ${isPanning.current ? 'is-panning' : ''}`}>
-      {/* Offline Indicator overlay (subtle UI) */}
+    <div className={`app mode-${activeTool} ${isPanning.current ? 'is-panning' : ''} relative w-screen h-screen overflow-hidden bg-white`}>
+      
+      {/* Offline Alert */}
       {!isConnected && (
-        <div style={{ position: 'absolute', top: 16, left: '50%', transform: 'translateX(-50%)', background: '#ef4444', color: '#fff', padding: '6px 16px', borderRadius: 20, zIndex: 1000, fontSize: 13, fontWeight: 600, boxShadow: '0 4px 12px rgba(239,68,68,0.4)'}}>
+        <div className="absolute top-20 left-1/2 -translate-x-1/2 bg-red-500 text-white px-4 py-1.5 rounded-full z-[100] text-sm font-medium shadow-md shadow-red-500/20">
           Reconnecting to server...
         </div>
       )}
 
-      {/* Toolbar */}
-      <div className="toolbar">
-        {/* Tools */}
-        <button className={`icon-btn ${activeTool === 'pen' ? 'active' : ''}`} onClick={() => setActiveTool('pen')} title="Pen Tool">
-          <IconPen />
-        </button>
-        <button className={`icon-btn ${activeTool === 'eraser' ? 'active' : ''}`} onClick={() => setActiveTool('eraser')} title="Eraser">
-          <IconEraser />
-        </button>
-        <button className={`icon-btn ${activeTool === 'pan' ? 'active' : ''}`} onClick={() => setActiveTool('pan')} title="Pan Tool">
-          <IconHand />
-        </button>
+      {/* Floating UI Elements */}
+      <TopBar 
+        userCount={userCount} 
+        onClear={clearBoard} 
+        onExport={download} 
+      />
 
-        <div className="sep" />
-
-        {/* Color */}
-        <div className="color-swatch" style={{ background: color, opacity: activeTool === 'eraser' ? 0.3 : 1 }}>
-          <input type="color" value={color} onChange={(e) => { setColor(e.target.value); setActiveTool('pen'); }} />
-        </div>
-
-        <div className="sep" />
-
-        {/* Actions */}
-        <button className="icon-btn" onClick={recenter} title="Re-center Camera">
-          <IconRecenter />
-        </button>
-        <button className="icon-btn danger" onClick={clearBoard} title="Clear Canvas">
-          <IconTrash />
-        </button>
-        <button className="icon-btn" onClick={download} title="Export Image">
-          <IconDownload />
-        </button>
-      </div>
+      <Toolbar 
+        activeTool={activeTool} 
+        setActiveTool={setActiveTool} 
+        color={color} 
+        setColor={setColor} 
+        brushSize={brushSize} 
+        setBrushSize={setBrushSize} 
+      />
 
       {/* Canvas */}
       <canvas
         ref={canvasRef}
-        className="drawing-canvas"
+        className="absolute inset-0 w-full h-full z-0"
         onPointerDown={onDown}
         onPointerMove={onMove}
         onPointerUp={onUp}
         onPointerLeave={onUp}
         onContextMenu={(e) => e.preventDefault()}
-        style={{ touchAction: 'none' }}
       />
     </div>
   );

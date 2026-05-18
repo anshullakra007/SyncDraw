@@ -6,6 +6,12 @@ export function useSocket(token, callbacks) {
   const [userCount, setUserCount] = useState(1);
   const socketRef = useRef(null);
 
+  const callbacksRef = useRef(callbacks);
+  
+  useEffect(() => {
+    callbacksRef.current = callbacks;
+  }, [callbacks]);
+
   useEffect(() => {
     if (!token) return;
 
@@ -24,7 +30,6 @@ export function useSocket(token, callbacks) {
     socket.on('connect', () => {
       console.log('✅ Connected to WebSocket server');
       setIsConnected(true);
-      // State reconciliation is handled by the server emitting 'init-canvas' upon connect
     });
 
     socket.on('disconnect', (reason) => {
@@ -34,16 +39,16 @@ export function useSocket(token, callbacks) {
 
     socket.on('user-count', (n) => setUserCount(n));
     
-    // Attach dynamically passed callbacks
-    if (callbacks.onInitCanvas) socket.on('init-canvas', callbacks.onInitCanvas);
-    if (callbacks.onDrawStroke) socket.on('draw-stroke', callbacks.onDrawStroke);
-    if (callbacks.onClearCanvas) socket.on('clear-canvas', callbacks.onClearCanvas);
-    if (callbacks.onError) socket.on('connect_error', callbacks.onError);
+    // Attach dynamically passed callbacks using refs to prevent render loops
+    socket.on('init-canvas', (s) => callbacksRef.current.onInitCanvas?.(s));
+    socket.on('draw-stroke', (s) => callbacksRef.current.onDrawStroke?.(s));
+    socket.on('clear-canvas', () => callbacksRef.current.onClearCanvas?.());
+    socket.on('connect_error', (e) => callbacksRef.current.onError?.(e));
 
     return () => {
       socket.disconnect();
     };
-  }, [token, callbacks.onInitCanvas, callbacks.onDrawStroke, callbacks.onClearCanvas, callbacks.onError]);
+  }, [token]);
 
   const emitStroke = (data) => {
     if (socketRef.current?.connected) {
