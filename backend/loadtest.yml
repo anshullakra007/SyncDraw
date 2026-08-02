@@ -1,0 +1,29 @@
+config:
+  target: "http://localhost:8080"
+  phases:
+    - duration: 30
+      arrivalRate: 5
+      rampTo: 100
+      name: "Ramp up to 100 users"
+    - duration: 30
+      arrivalRate: 100
+      name: "Sustain 100 users"
+  engines:
+    socketio-v3: {}
+scenarios:
+  - name: "Connect and draw strokes"
+    engine: "socketio-v3"
+    flow:
+      - connect:
+          auth:
+            token: "test-token"
+      - loop:
+        - emit:
+            channel: "draw-stroke"
+            data:
+              x: 100
+              y: 200
+              color: "#000000"
+              size: 2
+        - think: 0.1
+        count: 50
