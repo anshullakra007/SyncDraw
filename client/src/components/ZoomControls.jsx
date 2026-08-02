@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Plus, Minus } from 'lucide-react';
+import { Plus, Minus, Maximize2 } from 'lucide-react';
 
 export function ZoomControls({ cameraRef, redraw }) {
   const [zoomPercent, setZoomPercent] = useState(100);
 
   // Sync the zoom percentage display whenever redraw fires
-  // We use a polling approach via RAF to avoid coupling to camera internals
   useEffect(() => {
     let active = true;
     const syncZoom = () => {
@@ -52,7 +51,16 @@ export function ZoomControls({ cameraRef, redraw }) {
   }, [cameraRef, redraw]);
 
   return (
-    <div className="absolute bottom-6 right-6 z-50">
+    <div className="absolute bottom-6 right-6 z-50 flex items-center gap-2">
+      <button
+        onClick={resetZoom}
+        className="bg-white/90 backdrop-blur-sm px-3 py-2 rounded-xl shadow-lg border border-slate-200 flex items-center gap-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+        title="Recenter Canvas to Origin (0)"
+      >
+        <Maximize2 size={14} className="text-indigo-600" />
+        <span>Center Canvas</span>
+      </button>
+
       <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-lg border border-slate-200 flex items-center overflow-hidden">
         <button 
           onClick={zoomOut}
@@ -63,7 +71,7 @@ export function ZoomControls({ cameraRef, redraw }) {
         </button>
         <button 
           onClick={resetZoom}
-          className="px-2 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors min-w-[48px] text-center tabular-nums"
+          className="px-2 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition-colors min-w-[52px] text-center tabular-nums"
           title="Reset Zoom to 100% (0)"
         >
           {zoomPercent}%
@@ -79,4 +87,5 @@ export function ZoomControls({ cameraRef, redraw }) {
     </div>
   );
 }
+
 

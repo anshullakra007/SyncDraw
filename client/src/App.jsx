@@ -27,6 +27,7 @@ function App() {
   const [remoteCursors, setRemoteCursors] = useState({});
   const [showHelpModal, setShowHelpModal] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
+  const [textModal, setTextModal] = useState(null);
 
   const [isPanning, setIsPanning] = useState(false);
   const [canUndo, setCanUndo] = useState(false);
@@ -153,31 +154,42 @@ function App() {
     prevPosRef.current = w;
 
     if (activeTool === 'text') {
-      const text = window.prompt('Enter text annotation:');
-      if (text && text.trim()) {
-        const stroke = {
-          id: crypto.randomUUID(),
-          type: 'text',
-          text: text.trim(),
-          x0: w.x,
-          y0: w.y,
-          x1: w.x,
-          y1: w.y,
-          color,
-          lineWidth: brushSize
-        };
-        strokesRef.current.push(stroke);
-        undoStackRef.current.push(stroke);
-        redoStackRef.current = [];
-        updateUndoRedoUI();
-        redraw();
-        emitStroke(stroke);
-      }
+      setTextModal({
+        isOpen: true,
+        x: s.x,
+        y: s.y,
+        worldX: w.x,
+        worldY: w.y,
+        text: ''
+      });
       return;
     }
 
     isDrawingRef.current = true;
   };
+
+  const handleTextModalSubmit = useCallback(() => {
+    if (textModal && textModal.text && textModal.text.trim()) {
+      const stroke = {
+        id: crypto.randomUUID(),
+        type: 'text',
+        text: textModal.text.trim(),
+        x0: textModal.worldX,
+        y0: textModal.worldY,
+        x1: textModal.worldX,
+        y1: textModal.worldY,
+        color,
+        lineWidth: brushSize
+      };
+      strokesRef.current.push(stroke);
+      undoStackRef.current.push(stroke);
+      redoStackRef.current = [];
+      updateUndoRedoUI();
+      redraw();
+      emitStroke(stroke);
+    }
+    setTextModal(null);
+  }, [textModal, color, brushSize, redraw, emitStroke, updateUndoRedoUI, strokesRef]);
 
   const onMove = (e) => {
     const s = screenOf(e);
@@ -455,9 +467,63 @@ function App() {
 
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="absolute top-20 left-1/2 -translate-x-1/2 z-[150] transition-all animate-bounce">
-          <div className="bg-slate-900/90 text-white px-4 py-2 rounded-xl text-xs font-medium shadow-lg backdrop-blur-sm">
-            {toastMessage}
+        <div className="absolute top-20 left-1/2 -translate-x-1/2 z-[150] transition-all animate-in fade-in slide-in-from-top-4 duration-200">
+          <div className="bg-slate-900/95 text-white px-5 py-2.5 rounded-full text-xs font-semibold shadow-2xl backdrop-blur-md border border-slate-700/60 flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse" />
+            <span>{toastMessage}</span>
+          </div>
+        </div>
+      )}
+
+      {/* On-Canvas Text Annotation Popover */}
+      {textModal?.isOpen && (
+        <div 
+          className="absolute z-[120] bg-white rounded-2xl shadow-2xl border border-slate-200/80 p-4 w-72 animate-in fade-in zoom-in-95 duration-150 backdrop-blur-md"
+          style={{ 
+            left: Math.min(textModal.x, window.innerWidth - 300), 
+            top: Math.min(textModal.y, window.innerHeight - 200) 
+          }}
+        >
+          <div className="flex items-center justify-between mb-2.5">
+            <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Add Canvas Note</span>
+            <button 
+              onClick={() => setTextModal(null)} 
+              className="p-1 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors"
+            >
+              <X size={14} />
+            </button>
+          </div>
+          <textarea
+            value={textModal.text}
+            onChange={(e) => setTextModal({ ...textModal, text: e.target.value })}
+            placeholder="Type your note here..."
+            className="w-full h-24 p-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-800 resize-none font-medium"
+            autoFocus
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleTextModalSubmit();
+              } else if (e.key === 'Escape') {
+                setTextModal(null);
+              }
+            }}
+          />
+          <div className="flex justify-between items-center mt-3">
+            <span className="text-[10px] text-slate-400">Enter to add • Esc to cancel</span>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setTextModal(null)}
+                className="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleTextModalSubmit}
+                className="px-4 py-1.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-sm transition-colors"
+              >
+                Add Note
+              </button>
+            </div>
           </div>
         </div>
       )}
