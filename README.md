@@ -1,6 +1,8 @@
 #  SyncDraw - Real-Time Collaborative Whiteboard Engine
 
-**SyncDraw**is a high-performance real-time collaborative whiteboard engine built with**React**, **HTML5 Canvas**, and **Socket.io**. It enables multiple concurrent users to brainstorm, draw, and ideate on an infinite shared canvas with **sub-10ms WebSocket broadcast latency**and**Google OAuth 2.0 JWT authentication**at the WebSocket handshake layer.**Live Demo Application:**[sync-draw-eight.vercel.app](https://sync-draw-eight.vercel.app/)
+SyncDraw is a high-performance real-time collaborative whiteboard engine built with React, HTML5 Canvas, and Socket.io. It enables multiple concurrent users to brainstorm, draw, and ideate on an infinite shared canvas with sub-10ms WebSocket broadcast latency and Google OAuth 2.0 JWT authentication at the WebSocket handshake layer.
+
+ Live Demo Application: [sync-draw-eight.vercel.app](https://sync-draw-eight.vercel.app/)
 
 ---
 
@@ -31,9 +33,9 @@ graph TD
 ```
 
 ### Architectural Highlights
-1.**Authenticated WebSocket Signaling:**Every WebSocket connection undergoes JWT verification at handshake time using Google OAuth 2.0, preventing unauthorized injection into drawing rooms.
-2.**Optimized Frame Broadcasting:**Drawing events are grouped by stroke coordinates and broadcast asynchronously to connected peers in the room without server-side render blocking.
-3.**Hardware-Accelerated HTML5 Canvas:**The client leverages `requestAnimationFrame` for buttery-smooth 60 FPS vector stroke interpolation, preventing UI freezing during intensive multi-user drawing sessions.
+1. Authenticated WebSocket Signaling: Every WebSocket connection undergoes JWT verification at handshake time using Google OAuth 2.0, preventing unauthorized injection into drawing rooms.
+2. Optimized Frame Broadcasting: Drawing events are grouped by stroke coordinates and broadcast asynchronously to connected peers in the room without server-side render blocking.
+3. Hardware-Accelerated HTML5 Canvas: The client leverages `requestAnimationFrame` for buttery-smooth 60 FPS vector stroke interpolation, preventing UI freezing during intensive multi-user drawing sessions.
 
 ---
 
@@ -46,7 +48,7 @@ Spin up both the Node.js backend and React frontend instantly using Docker Compo
 docker-compose up -d --build
 ```
 
-Access the collaborative whiteboard at**`http://localhost:3000`**.
+Access the collaborative whiteboard at `http://localhost:3000`.
 
 *(Optional: Set `GOOGLE_CLIENT_ID` in your environment or `.env` file for live Google OAuth authentication).*
 
@@ -58,11 +60,11 @@ SyncDraw was benchmarked for WebSocket packet broadcast throughput and rendering
 
 | Metric | Measured Value | Benchmark Conditions |
 | :--- | :--- | :--- |
-| **Broadcast Latency**|**< 5.2 ms**| End-to-end WebSocket packet propagation |
-|**Packet Throughput**|**4,800+ events / sec**| Simultaneous coordinate frame broadcasts |
-|**Concurrent Sessions**|**50+ active draw streams**| Simultaneous users drawing in a single room |
-|**Client Rendering**|**60 FPS stable**| Vector rendering via HTML5 `requestAnimationFrame` |
-|**Handshake Auth Overhead**|**< 12 ms** | Google OAuth 2.0 JWT verification |
+| Broadcast Latency | < 5.2 ms | End-to-end WebSocket packet propagation |
+| Packet Throughput | 4,800+ events / sec | Simultaneous coordinate frame broadcasts |
+| Concurrent Sessions | 50+ active draw streams | Simultaneous users drawing in a single room |
+| Client Rendering | 60 FPS stable | Vector rendering via HTML5 `requestAnimationFrame` |
+| Handshake Auth Overhead | < 12 ms | Google OAuth 2.0 JWT verification |
 
 ### Running WebSocket Load Tests
 You can verify WebSocket broadcast throughput using `artillery` or custom Socket.io load-testing scripts:
@@ -84,10 +86,10 @@ console.log('Simulating 50 concurrent users emitting 1,000 draw frames/sec');
 ---
 
 ##  Key Features
-* **Zero-Latency Collaboration:** Emits and renders drawing strokes across multiple browser windows in real time.
-* **️ Rich Drawing Toolkit:** Customizable brush sizing, hex color selector, eraser mode, and clear-room broadcast.
-* **Infinite Canvas:** Smooth panning (`Alt + Drag` or Middle Click) and zooming across unbounded world coordinates.
-* **Enterprise Security:** Google OAuth 2.0 token validation before socket connection establishment.
+*  Zero-Latency Collaboration: Emits and renders drawing strokes across multiple browser windows in real time.
+* ️ Rich Drawing Toolkit: Customizable brush sizing, hex color selector, eraser mode, and clear-room broadcast.
+*  Infinite Canvas: Smooth panning (`Alt + Drag` or Middle Click) and zooming across unbounded world coordinates.
+*  Enterprise Security: Google OAuth 2.0 token validation before socket connection establishment.
 
 ---
 
