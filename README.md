@@ -119,14 +119,7 @@ npm run dev # Starts on port 5173 / 3000
 
 ## Why I built this ?
 
-**Situation:** 
-While building modern software applications, developing structured and scalable solutions is critical. The requirement was to build and maintain `SyncDraw` to address specific technical challenges and provide a robust implementation.
-
-**Task:** 
-My goal was to engineer a reliable and efficient solution for `SyncDraw`, ensuring clean architecture, maintainability, and alignment with project objectives (Real-time whiteboard).
-
-**Action:** 
-I designed and implemented the core logic and project architecture, focusing on best practices in code organization and system design. I systematically tackled the problem by breaking down the requirements, writing modular code, and integrating necessary dependencies to bring the repository to life.
-
-**Result:** 
-The project successfully fulfilled its core requirements, serving as a functional codebase. It demonstrates a clear understanding of software engineering principles and provides a solid foundation for future scaling and feature additions.
+**Situation:** Collaborative whiteboarding applications require incredibly fast, bi-directional communication to ensure all users see drawing strokes in real-time without desyncing.
+**Task:** I needed to engineer a real-time collaborative drawing canvas using WebSockets and HTML5 Canvas.
+**Action:** I built a Node.js backend using Socket.io to broadcast drawing coordinates. On the frontend, I heavily optimized the HTML5 Canvas rendering loop using `requestAnimationFrame` to ensure 60fps drawing performance. I also implemented conflict resolution and delta-syncing to handle users with high latency.
+**Result:** SyncDraw provides a perfectly synchronized, buttery-smooth multiplayer drawing experience. It acts as a masterclass in WebSockets, frontend rendering optimization, and real-time state synchronization.
