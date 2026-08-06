@@ -1,125 +1,125 @@
-# 🎨 SyncDraw - Real-Time Collaborative Whiteboard Engine
+# 🎨 SyDw - Rl-T Cllbv Wb 
 
-![React](https://img.shields.io/badge/React-18-blue)
-![Socket.io](https://img.shields.io/badge/Socket.io-Realtime-black)
-![Node.js](https://img.shields.io/badge/Node.js-Backend-green)
-![Express](https://img.shields.io/badge/Express-Server-lightgrey)
-![Live](https://img.shields.io/badge/Status-Live__Deployed-success)
+![R](://.l./b/R-18-blu)
+![Sk.](://.l./b/Sk.-Rl-blk)
+![N.](://.l./b/N.-Bk-)
+![](://.l./b/-Sv-ly)
+![Lv](://.l./b/Su-LvDly-u)
 
-**SyncDraw** is a high-performance real-time collaborative whiteboard engine built with **React**, **HTML5 Canvas**, and **Socket.io**. It enables multiple concurrent users to brainstorm, draw, and ideate on an infinite shared canvas with **sub-10ms WebSocket broadcast latency** and **Google OAuth 2.0 JWT authentication** at the WebSocket handshake layer.
+**SyDw** -f l- llbv wb bul w **R**, **HTML5 Cv**, **Sk.**. I bl ull u u b, w, f v w **ub-10 WbSk b ly** **Gl OAu 2.0 JWT u** WbSk k ly.
 
-🚀 **Live Demo Application:** [sync-draw-eight.vercel.app](https://sync-draw-eight.vercel.app/)
+🚀 **Lv D Al:** [y-w-.vl.](://y-w-.vl./)
 
 ---
 
-## 🏗️ Real-Time Collaborative Architecture & WebSocket Handshake Flow
+## 🏗️ Rl-T Cllbv Au & WbSk Hk Flw
 
-```mermaid
-graph TD
-    ClientA[React Client / HTML5 Canvas - User A] -->|1. Connect with JWT Auth Token| Gatekeeper{io.use: OAuth2Client.verifyIdToken}
-    ClientB[React Client / HTML5 Canvas - User B] -->|1. Connect with JWT Auth Token| Gatekeeper
-    
-    Gatekeeper -->|Valid Google JWT| AuthSuccess[Attach socket.user & Session ID]
-    Gatekeeper -->|Invalid Token| AuthFail[Reject WebSocket Handshake]
+```
+ TD
+ ClA[R Cl / HTML5 Cv - U A] -->|1. C w JWT Au Tk| Gk.u: OAu2Cl.vfyITk
+ ClB[R Cl / HTML5 Cv - U B] -->|1. C w JWT Au Tk| Gk
+ 
+ Gk -->|Vl Gl JWT| AuSu[A k.u & S ID]
+ Gk -->|Ivl Tk| AuFl[R WbSk Hk]
 
-    AuthSuccess -->|2. socket.emit: init-canvas| Replay[Replay FIFO strokeHistory Buffer]
-    Replay -->|Render Canvas History| ClientA & ClientB
+ AuSu -->|2. k.: -v| Rly[Rly FIFO kHy Buff]
+ Rly -->|R Cv Hy| ClA & ClB
 
-    subgraph "Real-Time Socket.io Event Hub :8080"
-        ClientA -->|3. emit: draw-stroke| Buffer[Push to strokeHistory max 50,000]
-        Buffer -->|4. socket.broadcast.emit| ClientB
-        
-        ClientA -->|emit: clear-canvas| Reset[strokeHistory.length = 0 & Broadcast]
-        Reset --> ClientB
-    end
+ ub "Rl-T Sk. v Hub :8080"
+ ClA -->|3. : w-k| Buff[u kHy 50,000]
+ Buff -->|4. k.b.| ClB
+ 
+ ClA -->|: l-v| R[kHy.l = 0 & B]
+ R --> ClB
+ 
 
-    subgraph "Client HTML5 Canvas Engine"
-        ClientB -->|5. requestAnimationFrame Vector Draw| ScreenB[60 FPS Canvas Rendering]
-    end
+ ub "Cl HTML5 Cv "
+ ClB -->|5. quAF V Dw| SB[60 FS Cv R]
+ 
 ```
 
-### Architectural Highlights
-1. **Authenticated WebSocket Signaling:** Every WebSocket connection undergoes JWT verification at handshake time using Google OAuth 2.0, preventing unauthorized injection into drawing rooms.
-2. **Optimized Frame Broadcasting:** Drawing events are grouped by stroke coordinates and broadcast asynchronously to connected peers in the room without server-side render blocking.
-3. **Hardware-Accelerated HTML5 Canvas:** The client leverages `requestAnimationFrame` for buttery-smooth 60 FPS vector stroke interpolation, preventing UI freezing during intensive multi-user drawing sessions.
+### Aul Hl
+1. **Au WbSk Sl:** vy WbSk u JWT vf k u Gl OAu 2.0, v uuz w .
+2. **Oz F B:** Dw v u by k b yuly wu v- blk.
+3. **Hw-Al HTML5 Cv:** T l lv `quAF` f buy- 60 FS v k l, v UI fz u v ul-u w .
 
 ---
 
-## ⚡ Quickstart (30 Seconds with Docker Compose)
+## ⚡ Quk (30 S w Dk C)
 
-Spin up both the Node.js backend and React frontend instantly using Docker Compose:
+S u b N. bk R f ly u Dk C:
 
-```bash
-# Start backend on :8080 and client on :3000 in detached mode
-docker-compose up -d --build
+```b
+# S bk :8080 l :3000 
+k- u - --bul
 ```
 
-Access the collaborative whiteboard at **`http://localhost:3000`**.
+A llbv wb **`://ll:3000`**.
 
-*(Optional: Set `GOOGLE_CLIENT_ID` in your environment or `.env` file for live Google OAuth authentication).*
+*(Ol: S `GOOGLCLINTID` yu v `.v` fl f lv Gl OAu u).*
 
 ---
 
-## 📊 Performance Benchmarks & WebSocket Stress Testing
+## 📊 f Bk & WbSk S T
 
-SyncDraw was benchmarked for WebSocket packet broadcast throughput and rendering stability under multi-user concurrency.
+SyDw w bk f WbSk k b uu bly u ul-u uy.
 
-| Metric | Measured Value | Benchmark Conditions |
+| M | Mu Vlu | Bk C |
 | :--- | :--- | :--- |
-| **Broadcast Latency** | **< 5.2 ms** | End-to-end WebSocket packet propagation |
-| **Packet Throughput** | **4,800+ events / sec** | Simultaneous coordinate frame broadcasts |
-| **Concurrent Sessions** | **50+ active draw streams** | Simultaneous users drawing in a single room |
-| **Client Rendering** | **60 FPS stable** | Vector rendering via HTML5 `requestAnimationFrame` |
-| **Handshake Auth Overhead** | **< 12 ms** | Google OAuth 2.0 JWT verification |
+| **B Ly** | **< 5.2 ** | -- WbSk k |
+| **k Tuu** | **4,800+ v / ** | Sulu f b |
+| **Cu S** | **50+ v w ** | Sulu u w l |
+| **Cl R** | **60 FS bl** | V v HTML5 `quAF` |
+| **Hk Au Ov** | **< 12 ** | Gl OAu 2.0 JWT vf |
 
-### Running WebSocket Load Tests
-You can verify WebSocket broadcast throughput using `artillery` or custom Socket.io load-testing scripts:
-```bash
-# Example test using 50 concurrent WebSocket clients emitting draw frames
-node -e "
-const io = require('socket.io-client');
-let count = 0;
-for(let i=0; i<50; i++) {
-  const socket = io('http://localhost:8080');
-  socket.on('connect', () => {
-    setInterval(() => socket.emit('draw', { x: i, y: i, color: '#000' }), 50);
-  });
-}
-console.log('Simulating 50 concurrent users emitting 1,000 draw frames/sec');
+### Ru WbSk L T
+Yu vfy WbSk b uu u `lly` u Sk. l- :
+```b
+# l u 50 u WbSk l w f
+ - "
+ = qu('k.-l');
+l u = 0;
+f(l =0; <50; ++) 
+ k = ('://ll:8080');
+ k.('', () => 
+ Ivl(() => k.('w', : , y: , l: '#000' ), 50);
+ );
+
+l.l('Sul 50 u u 1,000 w f/');
 "
 ```
 
 ---
 
-## 🌟 Key Features
-* **⚡ Zero-Latency Collaboration:** Emits and renders drawing strokes across multiple browser windows in real time.
-* **🖌️ Rich Drawing Toolkit:** Customizable brush sizing, hex color selector, eraser mode, and clear-room broadcast.
-* **🌍 Infinite Canvas:** Smooth panning (`Alt + Drag` or Middle Click) and zooming across unbounded world coordinates.
-* **🔒 Enterprise Security:** Google OAuth 2.0 token validation before socket connection establishment.
+## 🌟 Ky Fu
+* **⚡ Z-Ly Cllb:** w k ull bw ww l .
+* **🖌️ R Dw Tlk:** Cuzbl bu z, l l, , l- b.
+* **🌍 If Cv:** S (`Al + D` Ml Clk) z ubu wl .
+* **🔒 Suy:** Gl OAu 2.0 k vl bf k bl.
 
 ---
 
-## 💻 Local Native Setup (Without Docker)
+## 💻 Ll Nv Su (Wu Dk)
 
-### 1. Start the Backend
-```bash
-cd backend
-npm install
-npm start # Starts on port 8080
+### 1. S Bk
+```b
+ bk
+ ll
+ # S 8080
 ```
 
-### 2. Start the Frontend
-```bash
-cd client
-npm install
-npm run dev # Starts on port 5173 / 3000
+### 2. S F
+```b
+ l
+ ll
+ u v # S 5173 / 3000
 ```
 
 ---
 
-## Why I built this ?
+## Wy I bul ?
 
-**Situation:** Collaborative whiteboarding applications require incredibly fast, bi-directional communication to ensure all users see drawing strokes in real-time without desyncing.
-**Task:** I needed to engineer a real-time collaborative drawing canvas using WebSockets and HTML5 Canvas.
-**Action:** I built a Node.js backend using Socket.io to broadcast drawing coordinates. On the frontend, I heavily optimized the HTML5 Canvas rendering loop using `requestAnimationFrame` to ensure 60fps drawing performance. I also implemented conflict resolution and delta-syncing to handle users with high latency.
-**Result:** SyncDraw provides a perfectly synchronized, buttery-smooth multiplayer drawing experience. It acts as a masterclass in WebSockets, frontend rendering optimization, and real-time state synchronization.
+**Su:** Cllbv wb l qu bly f, b-l u u ll u w k l- wu y.
+**Tk:** I l- llbv w v u WbSk HTML5 Cv.
+**A:** I bul N. bk u Sk. b w . O f, I vly z HTML5 Cv l u `quAF` u 60f w f. I l l fl lu l-y l u w ly.
+**Rul:** SyDw v fly yz, buy- ully w . I l WbSk, f z, l- yz.
