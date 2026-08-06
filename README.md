@@ -1,4 +1,4 @@
-# 🎨 SyDw - Rl-T Cllbv Wb 
+#  SyDw - Rl-T Cllbv Wb 
 
 ![R](://.l./b/R-18-blu)
 ![Sk.](://.l./b/Sk.-Rl-blk)
@@ -8,11 +8,11 @@
 
 **SyDw** -f l- llbv wb bul w **R**, **HTML5 Cv**, **Sk.**. I bl ull u u b, w, f v w **ub-10 WbSk b ly** **Gl OAu 2.0 JWT u** WbSk k ly.
 
-🚀 **Lv D Al:** [y-w-.vl.](://y-w-.vl./)
+ **Lv D Al:** [y-w-.vl.](://y-w-.vl./)
 
 ---
 
-## 🏗️ Rl-T Cllbv Au & WbSk Hk Flw
+## ️ Rl-T Cllbv Au & WbSk Hk Flw
 
 ```
  TD
@@ -45,7 +45,7 @@
 
 ---
 
-## ⚡ Quk (30 S w Dk C)
+##  Quk (30 S w Dk C)
 
 S u b N. bk R f ly u Dk C:
 
@@ -60,7 +60,7 @@ A llbv wb **`://ll:3000`**.
 
 ---
 
-## 📊 f Bk & WbSk S T
+##  f Bk & WbSk S T
 
 SyDw w bk f WbSk k b uu bly u ul-u uy.
 
@@ -91,15 +91,15 @@ l.l('Sul 50 u u 1,000 w f/');
 
 ---
 
-## 🌟 Ky Fu
-* **⚡ Z-Ly Cllb:** w k ull bw ww l .
-* **🖌️ R Dw Tlk:** Cuzbl bu z, l l, , l- b.
-* **🌍 If Cv:** S (`Al + D` Ml Clk) z ubu wl .
-* **🔒 Suy:** Gl OAu 2.0 k vl bf k bl.
+##  Ky Fu
+* ** Z-Ly Cllb:** w k ull bw ww l .
+* **️ R Dw Tlk:** Cuzbl bu z, l l, , l- b.
+* ** If Cv:** S (`Al + D` Ml Clk) z ubu wl .
+* ** Suy:** Gl OAu 2.0 k vl bf k bl.
 
 ---
 
-## 💻 Ll Nv Su (Wu Dk)
+##  Ll Nv Su (Wu Dk)
 
 ### 1. S Bk
 ```b
