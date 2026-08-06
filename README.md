@@ -1,19 +1,5 @@
 # SyncDraw - Real-Time Collaborative Whiteboard Engine
 
-## Why I built this ?
-
-### Situation
-Collaborative whiteboarding applications require incredibly fast, bi-directional communication to ensure all users see drawing strokes in real-time without desyncing.
-
-### Task
-I needed to engineer a real-time collaborative drawing canvas using WebSockets and HTML5 Canvas.
-
-### Action
-I built a Node.js backend using Socket.io to broadcast drawing coordinates. On the frontend, I heavily optimized the HTML5 Canvas rendering loop using `requestAnimationFrame` to ensure 60fps drawing performance. I also implemented conflict resolution and delta-syncing to handle users with high latency.
-
-### Result
-SyncDraw provides a perfectly synchronized, buttery-smooth multiplayer drawing experience. It acts as a masterclass in WebSockets, frontend rendering optimization, and real-time state synchronization.
-
 ---
 
 SyncDraw is a high-performance real-time collaborative whiteboard engine built with React, HTML5 Canvas, and Socket.io. It enables multiple concurrent users to brainstorm, draw, and ideate on an infinite shared canvas with sub-10ms WebSocket broadcast latency and Google OAuth 2.0 JWT authentication at the WebSocket handshake layer.
@@ -126,3 +112,19 @@ npm run dev # Starts on port 5173 / 3000
 ```
 
 ---
+
+---
+
+## Why I built this ?
+
+### Situation
+Collaborative whiteboarding applications require incredibly fast, bi-directional communication to ensure all users see drawing strokes in real-time without desyncing.
+
+### Task
+I needed to engineer a real-time collaborative drawing canvas using WebSockets and HTML5 Canvas.
+
+### Action
+I built a Node.js backend using Socket.io to broadcast drawing coordinates. On the frontend, I heavily optimized the HTML5 Canvas rendering loop using `requestAnimationFrame` to ensure 60fps drawing performance. I also implemented conflict resolution and delta-syncing to handle users with high latency.
+
+### Result
+SyncDraw provides a perfectly synchronized, buttery-smooth multiplayer drawing experience. It acts as a masterclass in WebSockets, frontend rendering optimization, and real-time state synchronization.
