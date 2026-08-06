@@ -117,7 +117,7 @@ npm run dev # Starts on port 5173 / 3000
 
 ---
 
-## 🌟 STAR Story: SyncDraw
+## Why I built this ?
 
 **Situation:** 
 While building modern software applications, developing structured and scalable solutions is critical. The requirement was to build and maintain `SyncDraw` to address specific technical challenges and provide a robust implementation.
