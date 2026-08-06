@@ -1,4 +1,4 @@
-#  SyncDraw - Real-Time Collaborative Whiteboard Engine
+# SyncDraw - Real-Time Collaborative Whiteboard Engine
 
 ## Why I built this ?
 
@@ -22,7 +22,7 @@ SyncDraw is a high-performance real-time collaborative whiteboard engine built w
 
 ---
 
-## ️ Real-Time Collaborative Architecture & WebSocket Handshake Flow
+## Real-Time Collaborative Architecture & WebSocket Handshake Flow
 
 ```mermaid
 graph TD
@@ -55,7 +55,7 @@ graph TD
 
 ---
 
-##  Quickstart (30 Seconds with Docker Compose)
+## Quickstart (30 Seconds with Docker Compose)
 
 Spin up both the Node.js backend and React frontend instantly using Docker Compose:
 
@@ -70,7 +70,7 @@ Access the collaborative whiteboard at `http://localhost:3000`.
 
 ---
 
-##  Performance Benchmarks & WebSocket Stress Testing
+## Performance Benchmarks & WebSocket Stress Testing
 
 SyncDraw was benchmarked for WebSocket packet broadcast throughput and rendering stability under multi-user concurrency.
 
@@ -101,15 +101,15 @@ console.log('Simulating 50 concurrent users emitting 1,000 draw frames/sec');
 
 ---
 
-##  Key Features
-*  Zero-Latency Collaboration: Emits and renders drawing strokes across multiple browser windows in real time.
-* ️ Rich Drawing Toolkit: Customizable brush sizing, hex color selector, eraser mode, and clear-room broadcast.
-*  Infinite Canvas: Smooth panning (`Alt + Drag` or Middle Click) and zooming across unbounded world coordinates.
-*  Enterprise Security: Google OAuth 2.0 token validation before socket connection establishment.
+## Key Features
+* Zero-Latency Collaboration: Emits and renders drawing strokes across multiple browser windows in real time.
+* Rich Drawing Toolkit: Customizable brush sizing, hex color selector, eraser mode, and clear-room broadcast.
+* Infinite Canvas: Smooth panning (`Alt + Drag` or Middle Click) and zooming across unbounded world coordinates.
+* Enterprise Security: Google OAuth 2.0 token validation before socket connection establishment.
 
 ---
 
-##  Local Native Setup (Without Docker)
+## Local Native Setup (Without Docker)
 
 ### 1. Start the Backend
 ```bash
